@@ -1,0 +1,25 @@
+{
+  "name": "foty-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for the Friends of the Youth (FOTY) application.",
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@react-oauth/google": "^0.12.1",
+    "@stripe/stripe-js": "^3.5.0",
+    "@types/recharts": "^1.8.29",
+    "axios": "^1.7.2",
+    "js-file-download": "^0.4.12",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^6.23.1",
+    "recharts": "^3.3.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.14",
+    "vite": "^5.3.1"
+  }
+}

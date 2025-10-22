@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Friends of the Youth (FOTY)</title>
+    <!--
+      This project uses the Tailwind CSS JIT CDN for styling.
+      It automatically scans the HTML and JavaScript for Tailwind classes
+      and generates the necessary CSS on the fly. No build step is required for CSS.
+      Configuration is done in the script tag below.
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'brand-red': '#dc2626',
+              'brand-red-dark': '#b91c1c',
+              'light-bg': '#f9fafb',
+              'light-text': '#1f2937',
+              'dark-bg': '#111827',
+              'dark-text': '#f9fafb',
+              'dark-card': '#1f2937',
+            },
+            fontFamily: {
+              'serif-display': ['"DM Serif Display"', 'serif'],
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0",
+    "@stripe/stripe-js": "https://aistudiocdn.com/@stripe/stripe-js@^8.1.0",
+    "@react-oauth/google": "https://aistudiocdn.com/@react-oauth/google@^0.12.2",
+    "axios": "https://aistudiocdn.com/axios@^1.12.2",
+    "js-file-download": "https://aistudiocdn.com/js-file-download@^0.4.12"
+  }
+}
+</script>
+</head>
+  <body class="bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors duration-300">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
