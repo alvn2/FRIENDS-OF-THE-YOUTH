@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { ACHIEVEMENTS_DATA } from '../constants';
@@ -15,7 +14,7 @@ const MpesaLogo: React.FC<{ className?: string }> = ({ className }) => (
 
 const PendingIcon: React.FC = () => (
     <div className="animate-pulse">
-        <svg className="w-16 h-16 mx-auto text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-16 h-16 mx-auto text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h3m12 0h-3" />
         </svg>
@@ -130,7 +129,7 @@ const DonationPage: React.FC = () => {
             <div className="mb-4"><SuccessIcon /></div>
             <h3 className="text-2xl font-bold">Thank You!</h3>
             <p className="mt-2 text-gray-600 dark:text-gray-400">Your generous donation has been received. You are making a real difference!</p>
-            <button onClick={resetDonationForm} className="mt-6 text-white bg-brand-red hover:bg-brand-red-dark font-medium rounded-lg text-sm px-5 py-2.5">
+            <button onClick={resetDonationForm} className="mt-6 text-white bg-brand-primary hover:bg-brand-primary-dark font-medium rounded-lg text-sm px-5 py-2.5">
               Make Another Donation
             </button>
           </div>
@@ -141,7 +140,7 @@ const DonationPage: React.FC = () => {
             <div className="mb-4"><ErrorIcon /></div>
             <h3 className="text-2xl font-bold">Transaction Failed</h3>
             <p className="mt-2 text-gray-600 dark:text-gray-400">The request was cancelled or timed out. Please try again.</p>
-            <button onClick={resetDonationForm} className="mt-6 text-white bg-brand-red hover:bg-brand-red-dark font-medium rounded-lg text-sm px-5 py-2.5">
+            <button onClick={resetDonationForm} className="mt-6 text-white bg-brand-primary hover:bg-brand-primary-dark font-medium rounded-lg text-sm px-5 py-2.5">
               Try Again
             </button>
           </div>
@@ -158,7 +157,7 @@ const DonationPage: React.FC = () => {
                 <label className="block text-sm font-medium mb-2">Choose an Amount (KES)</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                   {[1000, 2500, 5000, 10000].map(opt => (
-                    <button key={opt} type="button" onClick={() => handleAmountClick(opt)} className={`py-3 px-4 rounded-lg font-semibold transition-colors ${amount === opt ? 'bg-brand-red text-white' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>KES {opt.toLocaleString()}</button>
+                    <button key={opt} type="button" onClick={() => handleAmountClick(opt)} className={`py-3 px-4 rounded-lg font-semibold transition-colors ${amount === opt ? 'bg-brand-primary text-white' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}>KES {opt.toLocaleString()}</button>
                   ))}
                 </div>
                 <div className="relative">
@@ -170,7 +169,7 @@ const DonationPage: React.FC = () => {
                 <label htmlFor="phone" className="block text-sm font-medium mb-1">M-Pesa Phone Number</label>
                 <input type="tel" name="phone" id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full p-2.5 bg-gray-50 dark:bg-gray-800 border dark:border-gray-600 rounded-lg" required placeholder="e.g. 0712345678" />
               </div>
-              <button type="submit" disabled={isLoading} className="w-full py-3 px-5 text-lg font-medium text-white rounded-lg bg-brand-red hover:bg-brand-red-dark disabled:bg-gray-400">
+              <button type="submit" disabled={isLoading} className="w-full py-3 px-5 text-lg font-medium text-white rounded-lg bg-brand-primary hover:bg-brand-primary-dark disabled:bg-gray-400">
                 {isLoading ? 'Processing...' : `Donate KES ${amount.toLocaleString()}`}
               </button>
             </form>

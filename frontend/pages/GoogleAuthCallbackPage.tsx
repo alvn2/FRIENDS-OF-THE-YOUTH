@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
-// Fix: Use namespace import for 'react-router-dom' to resolve module export errors.
-import * as ReactRouterDOM from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useNotification } from '../context/NotificationContext';
 
 const GoogleAuthCallbackPage: React.FC = () => {
-  // Fix: Replaced useHistory with useNavigate for react-router-dom v6.
-  const navigate = ReactRouterDOM.useNavigate();
-  const location = ReactRouterDOM.useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { addNotification } = useNotification();
   
   useEffect(() => {
@@ -16,7 +14,6 @@ const GoogleAuthCallbackPage: React.FC = () => {
 
     if (error) {
       addNotification(`Google login failed: ${error}`, 'error');
-      // Fix: Used navigate instead of history.push.
       navigate('/login');
     } else if (token) {
       localStorage.setItem('token', token);
@@ -26,7 +23,6 @@ const GoogleAuthCallbackPage: React.FC = () => {
       window.location.href = '#/dashboard';
     } else {
       addNotification('Google authentication failed. No token received.', 'error');
-      // Fix: Used navigate instead of history.push.
       navigate('/login');
     }
   }, [location, navigate, addNotification]);

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-// Fix: Use namespace import for 'react-router-dom' to resolve module export errors.
-import * as ReactRouterDOM from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from '../context/NotificationContext';
 
 // The backend server URL for Google OAuth
@@ -9,8 +8,7 @@ const GOOGLE_AUTH_URL = '/api/auth/google';
 
 const RegisterPage: React.FC = () => {
   const { register } = useAuth();
-  // Fix: Replaced useHistory with useNavigate for react-router-dom v6.
-  const navigate = ReactRouterDOM.useNavigate();
+  const navigate = useNavigate();
   const { addNotification } = useNotification();
   
   const [formData, setFormData] = useState({ name: '', email: '', password: '', password2: '' });
@@ -31,7 +29,6 @@ const RegisterPage: React.FC = () => {
     setIsLoading(true);
     try {
       await register(name, email, password);
-      // Fix: Used navigate instead of history.push.
       navigate('/register-success');
     } catch (err: any) {
       const errorMessage = err.response?.data?.msg || "Registration failed. Please try again.";
@@ -60,8 +57,8 @@ const RegisterPage: React.FC = () => {
                 <input type="text" name="name" id="name" value={name} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required />
               </div>
               <div>
-                <label htmlFor="register-email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                <input type="email" name="email" id="register-email" value={email} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required />
+                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
+                <input type="email" name="email" id="email" value={email} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required />
               </div>
               <div>
                 <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
@@ -71,7 +68,7 @@ const RegisterPage: React.FC = () => {
                 <label htmlFor="password2" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
                 <input type="password" name="password2" id="password2" value={password2} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required minLength={6} />
               </div>
-              <button type="submit" disabled={isLoading || isGoogleLoading} className="w-full text-white bg-brand-red hover:bg-brand-red-dark focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:bg-gray-400">
+              <button type="submit" disabled={isLoading || isGoogleLoading} className="w-full text-white bg-brand-primary hover:bg-brand-primary-dark focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:bg-gray-400">
                 {isLoading ? 'Creating account...' : 'Create account'}
               </button>
                <div className="relative flex py-2 items-center">
@@ -96,7 +93,7 @@ const RegisterPage: React.FC = () => {
                  )}
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Already have an account? <ReactRouterDOM.Link to="/login" className="font-medium text-brand-red hover:underline">Login here</ReactRouterDOM.Link>
+                Already have an account? <Link to="/login" className="font-medium text-brand-primary hover:underline">Login here</Link>
               </p>
             </form>
           </div>

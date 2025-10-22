@@ -78,7 +78,7 @@ const CommunityPage: React.FC = () => {
                                 <span className="text-2xl mr-3">{item.achievement.icon}</span>
                                 <div>
                                     <p className="text-sm font-semibold">
-                                        <span className="text-brand-red">{item.userName}</span> just unlocked the "{item.achievement.name}" badge!
+                                        <span className="text-brand-primary">{item.userName}</span> just unlocked the "{item.achievement.name}" badge!
                                     </p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400">{item.achievement.description}</p>
                                 </div>
@@ -98,9 +98,9 @@ const CommunityPage: React.FC = () => {
                                 value={aiTopic}
                                 onChange={(e) => setAiTopic(e.target.value)}
                                 placeholder="e.g., 'the importance of education'"
-                                className="flex-grow bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-brand-red focus:border-brand-red block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
+                                className="flex-grow bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-brand-primary focus:border-brand-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
                             />
-                            <button onClick={handleGeneratePost} disabled={isGenerating} className="px-4 py-2 text-sm font-medium text-white bg-brand-red rounded-lg hover:bg-brand-red-dark disabled:bg-gray-400">
+                            <button onClick={handleGeneratePost} disabled={isGenerating} className="px-4 py-2 text-sm font-medium text-white bg-brand-primary rounded-lg hover:bg-brand-primary-dark disabled:bg-gray-400">
                                 {isGenerating ? '...' : 'Generate'}
                             </button>
                         </div>
@@ -110,11 +110,11 @@ const CommunityPage: React.FC = () => {
                             value={newPostContent}
                             onChange={(e) => setNewPostContent(e.target.value)}
                             rows={4}
-                            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-brand-red focus:border-brand-red dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                             placeholder="Share your thoughts with the community..."
                             required
                         ></textarea>
-                        <button type="submit" disabled={isSubmitting} className="mt-4 py-2 px-5 text-sm font-medium text-center text-white rounded-lg bg-brand-red hover:bg-brand-red-dark focus:ring-4 focus:ring-red-300 disabled:bg-gray-400">
+                        <button type="submit" disabled={isSubmitting} className="mt-4 py-2 px-5 text-sm font-medium text-center text-white rounded-lg bg-brand-primary hover:bg-brand-primary-dark focus:ring-4 focus:ring-blue-300 disabled:bg-gray-400">
                              {isSubmitting ? 'Posting...' : 'Post'}
                         </button>
                     </form>
@@ -141,7 +141,7 @@ const CommunityPage: React.FC = () => {
                     <h2 className="text-3xl font-bold mb-4">You've Found Our Community Hub!</h2>
                     <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">This is where our members connect. Log in or register to join the conversation, share your stories, and see what everyone is talking about.</p>
                     <div className="flex justify-center gap-4">
-                        <Link to="/login" className="px-8 py-3 text-base font-medium text-white bg-brand-red rounded-lg hover:bg-brand-red-dark">Log In</Link>
+                        <Link to="/login" className="px-8 py-3 text-base font-medium text-white bg-brand-primary rounded-lg hover:bg-brand-primary-dark">Log In</Link>
                         <Link to="/register" className="px-8 py-3 text-base font-medium text-gray-800 dark:text-white bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-700 rounded-lg">Register</Link>
                     </div>
                 </div>

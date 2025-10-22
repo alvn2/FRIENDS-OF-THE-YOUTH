@@ -65,7 +65,7 @@ const OurReachPage: React.FC = () => {
                   onClick={() => setSelectedRegion(region)}
                   className={`w-full text-left p-4 rounded-lg transition-colors duration-200 ${
                     selectedRegion.name === region.name
-                      ? 'bg-brand-red text-white shadow'
+                      ? 'bg-brand-primary text-white shadow'
                       : 'hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -73,7 +73,7 @@ const OurReachPage: React.FC = () => {
                         <p className="font-semibold">{region.name}</p>
                         <span className={`text-xs px-2 py-0.5 rounded-full ${region.status === 'Active' ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-800'}`}>{region.status}</span>
                     </div>
-                  <p className={`text-sm ${selectedRegion.name === region.name ? 'text-red-100' : 'text-gray-500 dark:text-gray-400'}`}>{region.tagline}</p>
+                  <p className={`text-sm ${selectedRegion.name === region.name ? 'text-sky-100' : 'text-gray-500 dark:text-gray-400'}`}>{region.tagline}</p>
                 </button>
               ))}
             </div>
@@ -86,7 +86,7 @@ const OurReachPage: React.FC = () => {
             
             <p className="text-gray-700 dark:text-gray-300 mb-6">{selectedRegion.description}</p>
             
-            <Link to={selectedRegion.relatedLink} className="font-semibold text-brand-red hover:underline">
+            <Link to={selectedRegion.relatedLink} className="font-semibold text-brand-primary hover:underline">
               {selectedRegion.relatedText} &rarr;
             </Link>
           </div>

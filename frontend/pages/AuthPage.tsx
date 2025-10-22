@@ -1,23 +1,19 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-// Fix: Use namespace import for 'react-router-dom' to resolve module export errors.
-import * as ReactRouterDOM from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const AuthPage: React.FC = () => {
   const { login } = useAuth();
-  // Fix: Replaced useHistory with useNavigate for react-router-dom v6.
-  const navigate = ReactRouterDOM.useNavigate();
+  const navigate = useNavigate();
 
   // Fix: Updated handleLogin to be async and call login with correct arguments.
   const handleLogin = async (role: 'member' | 'admin') => {
     try {
         if (role === 'admin') {
           await login('admin@foty.org', 'password123'); // Using mock credentials
-          // Fix: Used navigate instead of history.push.
           navigate('/admin');
         } else {
           await login('member@foty.org', 'password123'); // Using mock credentials
-          // Fix: Used navigate instead of history.push.
           navigate('/dashboard');
         }
     } catch (e) {

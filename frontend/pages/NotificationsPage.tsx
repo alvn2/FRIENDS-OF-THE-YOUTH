@@ -26,7 +26,7 @@ const NotificationItem: React.FC<{ notif: Notification }> = ({ notif }) => {
                     {new Date(notif.timestamp).toLocaleString()}
                 </p>
                 {notif.link && (
-                    <Link to={notif.link} className="text-sm font-semibold text-brand-red hover:underline mt-2 inline-block">View Details</Link>
+                    <Link to={notif.link} className="text-sm font-semibold text-brand-primary hover:underline mt-2 inline-block">View Details</Link>
                 )}
             </div>
             {!notif.read && (
@@ -52,13 +52,13 @@ const NotificationsPage: React.FC = () => {
 
     const hasUnread = notifications.some(n => !n.read);
     const getTabClass = (tabName: string) => 
-        `px-4 py-2 text-sm font-medium rounded-md ${filter === tabName ? 'bg-brand-red text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`;
+        `px-4 py-2 text-sm font-medium rounded-md ${filter === tabName ? 'bg-brand-primary text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`;
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-3xl">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold">Notifications</h1>
-                {hasUnread && <button onClick={markAllAsRead} className="text-sm font-medium text-brand-red hover:underline">Mark all as read</button>}
+                {hasUnread && <button onClick={markAllAsRead} className="text-sm font-medium text-brand-primary hover:underline">Mark all as read</button>}
             </div>
             
             <div className="mb-4 flex items-center gap-2 p-2 bg-gray-100 dark:bg-dark-card rounded-lg">

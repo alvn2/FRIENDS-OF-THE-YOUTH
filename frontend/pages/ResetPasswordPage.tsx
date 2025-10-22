@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-// Fix: Use namespace import for 'react-router-dom' to resolve module export errors.
-import * as ReactRouterDOM from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useNotification } from '../context/NotificationContext';
 import api from '../services/api';
 
 const ResetPasswordPage: React.FC = () => {
-  const { token } = ReactRouterDOM.useParams<{ token: string }>();
-  // Fix: Replaced useHistory with useNavigate for react-router-dom v6.
-  const navigate = ReactRouterDOM.useNavigate();
+  const { token } = useParams<{ token: string }>();
+  const navigate = useNavigate();
   const { addNotification } = useNotification();
 
   const [formData, setFormData] = useState({ password: '', password2: '' });
@@ -34,7 +32,6 @@ const ResetPasswordPage: React.FC = () => {
       // In a real backend, this would verify the token and update the user's password.
       await api.post(`/auth/reset-password/${token}`, { password });
       addNotification('Password has been reset successfully. Please log in.', 'success');
-      // Fix: Used navigate instead of history.push.
       navigate('/login');
     } catch (err: any) {
       const errorMessage = err.response?.data?.msg || "Failed to reset password. The link may have expired.";
@@ -61,7 +58,7 @@ const ResetPasswordPage: React.FC = () => {
                   id="password"
                   value={password}
                   onChange={onChange}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-red focus:border-brand-red block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-primary focus:border-brand-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
                   required
                   minLength={6}
                 />
@@ -74,7 +71,7 @@ const ResetPasswordPage: React.FC = () => {
                   id="password2"
                   value={password2}
                   onChange={onChange}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-red focus:border-brand-red block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-primary focus:border-brand-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
                   required
                   minLength={6}
                 />
@@ -82,7 +79,7 @@ const ResetPasswordPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full text-white bg-brand-red hover:bg-brand-red-dark focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:bg-gray-400"
+                className="w-full text-white bg-brand-primary hover:bg-brand-primary-dark focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:bg-gray-400"
               >
                 {isLoading ? 'Resetting...' : 'Reset Password'}
               </button>

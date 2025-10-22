@@ -12,7 +12,7 @@ const VolunteerPage: React.FC = () => {
         return (
             <Link 
                 to="/contact"
-                className="mt-auto text-center text-white bg-brand-red hover:bg-brand-red-dark focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-300"
+                className="mt-auto text-center text-white bg-brand-primary hover:bg-brand-primary-dark focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-300"
             >
                 Apply Now
             </Link>
@@ -22,7 +22,7 @@ const VolunteerPage: React.FC = () => {
         <Link 
             to="/login"
             state={{ from: location }}
-            className="mt-auto text-center text-white bg-brand-red hover:bg-brand-red-dark focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-300"
+            className="mt-auto text-center text-white bg-brand-primary hover:bg-brand-primary-dark focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-300"
         >
             Login to Apply
         </Link>
@@ -50,7 +50,7 @@ const VolunteerPage: React.FC = () => {
               <span className="font-semibold">Skills Needed:</span>
               <div className="flex flex-wrap gap-2 mt-2">
                 {opp.skills.map(skill => (
-                  <span key={skill} className="bg-brand-red/10 text-brand-red text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                  <span key={skill} className="bg-brand-primary/10 text-brand-primary text-xs font-semibold px-2.5 py-0.5 rounded-full">
                     {skill}
                   </span>
                 ))}

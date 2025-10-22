@@ -20,18 +20,18 @@ const BG_COLORS = {
 };
 
 const Notification: React.FC = () => {
-    const notifications = useNotifications();
+    const { toasts } = useNotifications();
 
-    if (!notifications.length) {
+    if (!toasts.length) {
         return null;
     }
 
     return (
         <div className="fixed bottom-5 right-5 z-50 space-y-3">
-            {notifications.map(notif => (
-                <div key={notif.id} className={`flex items-center p-4 text-sm rounded-lg shadow-lg ${BG_COLORS[notif.type]}`} role="alert">
-                    <div className="mr-3">{ICONS[notif.type]}</div>
-                    <span className="font-medium">{notif.message}</span>
+            {toasts.map(toast => (
+                <div key={toast.id} className={`flex items-center p-4 text-sm rounded-lg shadow-lg ${BG_COLORS[toast.type]}`} role="alert">
+                    <div className="mr-3">{ICONS[toast.type]}</div>
+                    <span className="font-medium">{toast.message}</span>
                 </div>
             ))}
         </div>

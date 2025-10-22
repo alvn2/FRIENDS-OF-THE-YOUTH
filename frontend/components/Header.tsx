@@ -26,8 +26,8 @@ const Header: React.FC = () => {
   const getNavLinkClass = (path: string, end: boolean = false) => {
     const isActive = end ? location.pathname === path : location.pathname.startsWith(path);
     return `block py-2 px-3 rounded md:p-0 ${isActive 
-      ? 'text-white bg-brand-red md:bg-transparent md:text-brand-red dark:text-white' 
-      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-brand-red dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
+      ? 'text-white bg-brand-primary md:bg-transparent md:text-brand-primary dark:text-white' 
+      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-brand-primary dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
     }`;
   };
 
@@ -35,30 +35,36 @@ const Header: React.FC = () => {
     <header className="bg-white/80 dark:bg-dark-bg/80 backdrop-blur-sm sticky top-0 z-50 shadow-md">
       <nav className="container mx-auto px-4 lg:px-6 py-2.5">
         <div className="flex flex-wrap justify-between items-center">
-          <a href="#/" className="flex items-center">
-            <FotyLogo className="h-8 w-auto text-brand-red" />
+          <a href="#/" className="flex items-center h-12 w-48">
+            <FotyLogo className="h-full w-auto" />
           </a>
           <div className="flex items-center lg:order-2">
             <button onClick={toggleTheme} className="p-2 mr-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
               {theme === 'light' ? <MoonIcon className="w-5 h-5" /> : <SunIcon className="w-5 h-5" />}
             </button>
+
+            {/* --- Desktop Auth Buttons --- */}
             {!isLoading && (
-              isAuthenticated ? (
-                <>
-                  <NotificationBell />
-                  {user && user.role === 'admin' && (
-                    <a href="#/admin" className="text-gray-800 dark:text-white hover:bg-gray-50 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700">Admin</a>
-                  )}
-                  <a href="#/dashboard" className="text-gray-800 dark:text-white hover:bg-gray-50 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700">Dashboard</a>
-                  <button onClick={logout} className="text-white bg-brand-red hover:bg-brand-red-dark font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5">Logout</button>
-                </>
-              ) : (
-                <>
-                  <a href="#/login" className="text-gray-800 dark:text-white hover:bg-gray-50 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700">Login</a>
-                  <a href="#/register" className="text-white bg-brand-red hover:bg-brand-red-dark font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5">Register</a>
-                </>
-              )
+              <div className="hidden lg:flex items-center">
+                {isAuthenticated ? (
+                  <>
+                    <NotificationBell />
+                    {user && user.role === 'admin' && (
+                      <a href="#/admin" className="text-gray-800 dark:text-white hover:bg-gray-50 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700">Admin</a>
+                    )}
+                    <a href="#/dashboard" className="text-gray-800 dark:text-white hover:bg-gray-50 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700">Dashboard</a>
+                    <button onClick={logout} className="text-white bg-brand-primary hover:bg-brand-primary-dark font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5">Logout</button>
+                  </>
+                ) : (
+                  <>
+                    <a href="#/login" className="text-gray-800 dark:text-white hover:bg-gray-50 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700">Login</a>
+                    <a href="#/register" className="text-white bg-brand-primary hover:bg-brand-primary-dark font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5">Register</a>
+                  </>
+                )}
+              </div>
             )}
+            
+            {/* --- Hamburger Menu Button --- */}
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)} 
               type="button" 
@@ -79,8 +85,26 @@ const Header: React.FC = () => {
               <li><a href="#/news" className={getNavLinkClass('/news')}>News</a></li>
               <li><a href="#/events" className={getNavLinkClass('/events')}>Events</a></li>
               <li><a href="#/team" className={getNavLinkClass('/team')}>Team</a></li>
-              <li><a href="#/donate" className={getNavLinkClass('/donate')}>Donate</a></li>
             </ul>
+            {/* --- Mobile Auth Buttons --- */}
+            {!isLoading && (
+              <div className="lg:hidden mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                {isAuthenticated ? (
+                  <>
+                    {user && user.role === 'admin' && (
+                      <a href="#/admin" className="block text-center text-gray-800 dark:text-white hover:bg-gray-50 font-medium rounded-lg text-sm px-5 py-2.5 dark:hover:bg-gray-700">Admin</a>
+                    )}
+                    <a href="#/dashboard" className="block text-center text-gray-800 dark:text-white hover:bg-gray-50 font-medium rounded-lg text-sm px-5 py-2.5 dark:hover:bg-gray-700">Dashboard</a>
+                    <button onClick={() => { logout(); setIsMenuOpen(false); }} className="w-full text-white bg-brand-primary hover:bg-brand-primary-dark font-medium rounded-lg text-sm px-5 py-2.5">Logout</button>
+                  </>
+                ) : (
+                  <>
+                    <a href="#/login" className="block text-center text-gray-800 dark:text-white hover:bg-gray-50 font-medium rounded-lg text-sm px-5 py-2.5 dark:hover:bg-gray-700">Login</a>
+                    <a href="#/register" className="block text-center text-white bg-brand-primary hover:bg-brand-primary-dark font-medium rounded-lg text-sm px-5 py-2.5">Register</a>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </nav>

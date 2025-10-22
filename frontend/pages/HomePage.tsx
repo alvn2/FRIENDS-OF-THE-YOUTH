@@ -8,7 +8,7 @@ const YouthEmpowermentIcon: React.FC = () => (
         <path d="M9 18a3 3 0 100-6 3 3 0 000 6zM15 18a3 3 0 100-6 3 3 0 000 6z" />
         <path d="M9 12v-2a3 3 0 013-3h0a3 3 0 013 3v2" />
         <path d="M12 12h-1c-2.5 0-4.5-2-4.5-4.5V6" />
-        <path d="M12 12h1c2.5 0 4.5-2 4.5-4.5V6" />
+        <path d="M12 12h1c2.5 0 4.5-2-4.5-4.5V6" />
     </svg>
 );
 
@@ -49,7 +49,7 @@ const ShareIcon = () => <svg className="w-10 h-10 mb-3" fill="none" viewBox="0 0
 // --- Section Components ---
 const CauseCard: React.FC<{ title: string; description: string; icon: React.ReactNode; bgColor: string }> = ({ title, description, icon, bgColor }) => (
     <div className={`p-8 rounded-xl shadow-sm ${bgColor} hover:shadow-lg hover:-translate-y-1 transition-all duration-300`}>
-        <div className="bg-white text-brand-red dark:text-brand-red rounded-full w-16 h-16 flex items-center justify-center mb-5 ring-1 ring-black/5">
+        <div className="bg-white text-brand-primary dark:text-brand-primary rounded-full w-16 h-16 flex items-center justify-center mb-5 ring-1 ring-black/5">
             {icon}
         </div>
         <h3 className="text-2xl font-serif-display font-bold text-gray-800 dark:text-white mb-2">{title}</h3>
@@ -59,7 +59,7 @@ const CauseCard: React.FC<{ title: string; description: string; icon: React.Reac
 
 const ImpactNumber: React.FC<{ value: string; label: string; subLabel: string }> = ({ value, label, subLabel }) => (
     <div className="text-center">
-        <p className="text-5xl font-extrabold text-brand-red">{value}</p>
+        <p className="text-4xl sm:text-5xl font-extrabold text-brand-primary">{value}</p>
         <p className="text-xl font-bold text-gray-800 dark:text-gray-200 mt-2">{label}</p>
         <p className="text-sm text-gray-500 dark:text-gray-400">{subLabel}</p>
     </div>
@@ -70,7 +70,7 @@ const ActionCard: React.FC<{ title: string; description: string; buttonText: str
         {icon}
         <h3 className="text-2xl font-bold mb-3">{title}</h3>
         <p className="text-gray-600 dark:text-gray-400 mb-6 flex-grow">{description}</p>
-        <Link to={link} className="mt-auto inline-block px-8 py-3 text-base font-medium text-white bg-brand-red rounded-lg hover:bg-brand-red-dark transition-colors">
+        <Link to={link} className="mt-auto inline-block px-8 py-3 text-base font-medium text-white bg-brand-primary rounded-lg hover:bg-brand-primary-dark transition-colors">
             {buttonText}
         </Link>
     </div>
@@ -102,7 +102,7 @@ const HomePage: React.FC = () => {
                         We are a new foundation dedicated to creating sustainable change through education, health, and mentorship.
                     </p>
                     <div className="mt-8 flex justify-center gap-4">
-                        <Link to="/donate" className="px-8 py-4 text-lg font-semibold text-white bg-brand-red rounded-lg hover:bg-brand-red-dark transition-transform transform hover:scale-105 shadow-lg">
+                        <Link to="/donate" className="px-8 py-4 text-lg font-semibold text-white bg-brand-primary rounded-lg hover:bg-brand-primary-dark transition-transform transform hover:scale-105 shadow-lg">
                             Donate Now
                         </Link>
                         <Link to="/about" className="px-8 py-4 text-lg font-semibold text-gray-900 bg-white rounded-lg hover:bg-gray-200 transition-transform transform hover:scale-105 shadow-lg">
@@ -194,7 +194,7 @@ const HomePage: React.FC = () => {
                             <p className="text-gray-600 dark:text-gray-300 mb-6">
                                 {latestArticle.excerpt}
                             </p>
-                            <Link to={`/news/${latestArticle.id}`} className="inline-block px-6 py-3 text-base font-medium text-white bg-brand-red rounded-lg hover:bg-brand-red-dark">
+                            <Link to={`/news/${latestArticle.id}`} className="inline-block px-6 py-3 text-base font-medium text-white bg-brand-primary rounded-lg hover:bg-brand-primary-dark">
                                 Read Full Story
                             </Link>
                         </div>

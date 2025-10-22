@@ -50,7 +50,7 @@ const EventDetailPage: React.FC = () => {
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-3xl font-bold">Event not found</h1>
         <p className="mt-4">The event you are looking for does not exist.</p>
-        <Link to="/events" className="text-brand-red hover:underline mt-6 inline-block">
+        <Link to="/events" className="text-brand-primary hover:underline mt-6 inline-block">
           &larr; Back to all events
         </Link>
       </div>
@@ -61,7 +61,7 @@ const EventDetailPage: React.FC = () => {
     <div className="bg-white dark:bg-dark-bg py-8 md:py-16">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-6">
-          <Link to="/events" className="text-brand-red hover:underline text-sm">
+          <Link to="/events" className="text-brand-primary hover:underline text-sm">
             &larr; Back to all events
           </Link>
         </div>
@@ -94,7 +94,7 @@ const EventDetailPage: React.FC = () => {
               <button 
                 onClick={handleRegister} 
                 disabled={isRegistering}
-                className="inline-block text-white bg-brand-red hover:bg-brand-red-dark focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-lg px-8 py-3.5 text-center transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="inline-block text-white bg-brand-primary hover:bg-brand-primary-dark focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-lg px-8 py-3.5 text-center transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {isRegistering ? 'Registering...' : 'Register for this Event'}
               </button>
@@ -102,7 +102,7 @@ const EventDetailPage: React.FC = () => {
           ) : (
             <div className="p-4 bg-gray-100 dark:bg-dark-card rounded-lg">
               <p className="text-gray-700 dark:text-gray-300">
-                <Link to="/login" state={{ from: location }} className="text-brand-red font-bold hover:underline">Log in</Link> or <Link to="/register" className="text-brand-red font-bold hover:underline">create an account</Link> to register for this event.
+                <Link to="/login" state={{ from: location }} className="text-brand-primary font-bold hover:underline">Log in</Link> or <Link to="/register" className="text-brand-primary font-bold hover:underline">create an account</Link> to register for this event.
               </p>
             </div>
           )}

@@ -2,15 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3csvg viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3e%3cg transform='translate(30, 30)'%3e%3ccircle cx='0' cy='0' r='28' fill='none' stroke='%23dc2626' stroke-width='3' /%3e%3cg fill='%23dc2626'%3e%3cg transform='rotate(45)'%3e%3ccircle cx='0' cy='-15' r='6' /%3e%3cpath d='M-10 12 C -10 2, 10 2, 10 12 Z' /%3e%3c/g%3e%3cg transform='rotate(135)'%3e%3ccircle cx='0' cy='-15' r='6' /%3e%3cpath d='M-10 12 C -10 2, 10 2, 10 12 Z' /%3e%3c/g%3e%3cg transform='rotate(225)'%3e%3ccircle cx='0' cy='-15' r='6' /%3e%3cpath d='M-10 12 C -10 2, 10 2, 10 12 Z' /%3e%3c/g%3e%3cg transform='rotate(315)'%3e%3ccircle cx='0' cy='-15' r='6' /%3e%3cpath d='M-10 12 C -10 2, 10 2, 10 12 Z' /%3e%3c/g%3e%3c/g%3e%3c/g%3e%3c/svg%3e" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3cg transform='translate(50,50) scale(0.9)'%3e%3cg transform='rotate(18)'%3e%3ccircle cx='0' cy='-30' r='6' fill='%23f97316'/%3e%3cellipse cx='0' cy='-14' rx='8' ry='12' fill='%23f97316'/%3e%3c/g%3e%3cg transform='rotate(90)'%3e%3ccircle cx='0' cy='-30' r='6' fill='%23ec4899'/%3e%3cellipse cx='0' cy='-14' rx='8' ry='12' fill='%23ec4899'/%3e%3c/g%3e%3cg transform='rotate(162)'%3e%3ccircle cx='0' cy='-30' r='6' fill='%238b5cf6'/%3e%3cellipse cx='0' cy='-14' rx='8' ry='12' fill='%238b5cf6'/%3e%3c/g%3e%3cg transform='rotate(234)'%3e%3ccircle cx='0' cy='-30' r='6' fill='%2338bdf8'/%3e%3cellipse cx='0' cy='-14' rx='8' ry='12' fill='%2338bdf8'/%3e%3c/g%3e%3cg transform='rotate(306)'%3e%3ccircle cx='0' cy='-30' r='6' fill='%2384cc16'/%3e%3cellipse cx='0' cy='-14' rx='8' ry='12' fill='%2384cc16'/%3e%3c/g%3e%3c/g%3e%3c/svg%3e" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Friends of the Youth (FOTY)</title>
-    <!--
-      This project uses the Tailwind CSS JIT CDN for styling.
-      It automatically scans the HTML and JavaScript for Tailwind classes
-      and generates the necessary CSS on the fly. No build step is required for CSS.
-      Configuration is done in the script tag below.
-    -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,8 +16,13 @@
         theme: {
           extend: {
             colors: {
-              'brand-red': '#dc2626',
-              'brand-red-dark': '#b91c1c',
+              'brand-primary': '#0284c7', // Darker, more accessible blue
+              'brand-primary-dark': '#0369a1',
+              'brand-accent-orange': '#f97316',
+              'brand-accent-pink': '#ec4899',
+              'brand-accent-purple': '#8b5cf6',
+              'brand-accent-lightblue': '#38bdf8',
+              'brand-accent-green': '#84cc16',
               'light-bg': '#f9fafb',
               'light-text': '#1f2937',
               'dark-bg': '#111827',
@@ -41,14 +40,13 @@
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0",
-    "@stripe/stripe-js": "https://aistudiocdn.com/@stripe/stripe-js@^8.1.0",
-    "@react-oauth/google": "https://aistudiocdn.com/@react-oauth/google@^0.12.2",
     "axios": "https://aistudiocdn.com/axios@^1.12.2",
-    "js-file-download": "https://aistudiocdn.com/js-file-download@^0.4.12"
+    "recharts": "https://aistudiocdn.com/recharts@^3.3.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.26.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@react-oauth/google": "https://aistudiocdn.com/@react-oauth/google@^0.12.2",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4"
   }
 }
 </script>

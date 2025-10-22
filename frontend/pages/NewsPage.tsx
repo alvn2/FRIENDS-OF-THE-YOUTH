@@ -19,7 +19,7 @@ const NewsPage: React.FC = () => {
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{article.date}</p>
               <h3 className="text-xl font-bold mb-2 flex-grow">{article.title}</h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">{article.excerpt}</p>
-              <a href={`#/news/${article.id}`} className="text-brand-red hover:text-brand-red-dark font-semibold self-start">
+              <a href={`#/news/${article.id}`} className="text-brand-primary hover:text-brand-primary-dark font-semibold self-start">
                 Read More &rarr;
               </a>
             </div>

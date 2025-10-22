@@ -63,7 +63,7 @@ const NotificationBell: React.FC = () => {
         <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-dark-card rounded-lg shadow-xl z-20 overflow-hidden">
           <div className="p-3 flex justify-between items-center border-b dark:border-gray-700">
             <h3 className="font-semibold text-sm">Notifications</h3>
-            {unreadCount > 0 && <button onClick={() => markAsRead('all')} className="text-xs text-brand-red hover:underline">Mark all as read</button>}
+            {unreadCount > 0 && <button onClick={() => markAsRead('all')} className="text-xs text-brand-primary hover:underline">Mark all as read</button>}
           </div>
           <div className="max-h-96 overflow-y-auto">
             {notifications.length > 0 ? (
@@ -81,7 +81,7 @@ const NotificationBell: React.FC = () => {
                 <p className="p-4 text-sm text-gray-500 dark:text-gray-400 text-center">No notifications yet.</p>
             )}
           </div>
-          <Link to="/notifications" onClick={() => setIsOpen(false)} className="block bg-gray-50 dark:bg-gray-900/50 text-center py-2 text-sm font-medium text-brand-red hover:underline">
+          <Link to="/notifications" onClick={() => setIsOpen(false)} className="block bg-gray-50 dark:bg-gray-900/50 text-center py-2 text-sm font-medium text-brand-primary hover:underline">
             View All Notifications
           </Link>
         </div>

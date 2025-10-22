@@ -2,7 +2,7 @@ import React from 'react';
 
 const FocusArea: React.FC<{ label: string; description: string }> = ({ label, description }) => (
     <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-        <h4 className="font-bold text-lg text-brand-red">{label}</h4>
+        <h4 className="font-bold text-lg text-brand-primary">{label}</h4>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{description}</p>
     </div>
 );

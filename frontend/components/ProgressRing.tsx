@@ -29,7 +29,7 @@ const ProgressRing: React.FC<ProgressRingProps> = ({ radius, stroke, progress, l
           cy={radius}
         />
         <circle
-          className="text-brand-red"
+          className="text-brand-primary"
           stroke="currentColor"
           strokeWidth={stroke}
           strokeDasharray={circumference + ' ' + circumference}

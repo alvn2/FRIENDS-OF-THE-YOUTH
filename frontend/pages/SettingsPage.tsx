@@ -63,7 +63,7 @@ const SettingsPage: React.FC = () => {
     if (!user) { return <div>Loading...</div>; }
 
     const getTabClass = (tabName: string) => 
-        `inline-block p-4 rounded-t-lg border-b-2 ${activeTab === tabName ? 'text-brand-red border-brand-red' : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'}`;
+        `inline-block p-4 rounded-t-lg border-b-2 ${activeTab === tabName ? 'text-brand-primary border-brand-primary' : 'border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300'}`;
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -100,7 +100,7 @@ const SettingsPage: React.FC = () => {
                             <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleFormChange} className="bg-gray-50 border text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700" />
                         </div>
                         <div className="text-right">
-                            <button type="submit" disabled={isSaving} className="text-white bg-brand-red hover:bg-brand-red-dark font-medium rounded-lg text-sm px-5 py-2.5 disabled:bg-gray-400">
+                            <button type="submit" disabled={isSaving} className="text-white bg-brand-primary hover:bg-brand-primary-dark font-medium rounded-lg text-sm px-5 py-2.5 disabled:bg-gray-400">
                                 {isSaving ? 'Saving...' : 'Save Changes'}
                             </button>
                         </div>
@@ -118,28 +118,28 @@ const SettingsPage: React.FC = () => {
                                 <span className="font-medium">New Achievements</span>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">When you unlock a new badge.</p>
                             </div>
-                            <input type="checkbox" id="achievements" name="achievements" checked={prefs.achievements} onChange={handlePrefsChange} className="w-5 h-5 text-brand-red bg-gray-100 rounded border-gray-300 focus:ring-brand-red" />
+                            <input type="checkbox" id="achievements" name="achievements" checked={prefs.achievements} onChange={handlePrefsChange} className="w-5 h-5 text-brand-primary bg-gray-100 rounded border-gray-300 focus:ring-brand-primary" />
                         </label>
                          <label htmlFor="events" className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                             <div>
                                 <span className="font-medium">Events & Reminders</span>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">When you register or an event is near.</p>
                             </div>
-                            <input type="checkbox" id="events" name="events" checked={prefs.events} onChange={handlePrefsChange} className="w-5 h-5 text-brand-red bg-gray-100 rounded border-gray-300 focus:ring-brand-red" />
+                            <input type="checkbox" id="events" name="events" checked={prefs.events} onChange={handlePrefsChange} className="w-5 h-5 text-brand-primary bg-gray-100 rounded border-gray-300 focus:ring-brand-primary" />
                         </label>
                          <label htmlFor="community" className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                             <div>
                                 <span className="font-medium">Community Activity</span>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">When you post in the community forum.</p>
                             </div>
-                            <input type="checkbox" id="community" name="community" checked={prefs.community} onChange={handlePrefsChange} className="w-5 h-5 text-brand-red bg-gray-100 rounded border-gray-300 focus:ring-brand-red" />
+                            <input type="checkbox" id="community" name="community" checked={prefs.community} onChange={handlePrefsChange} className="w-5 h-5 text-brand-primary bg-gray-100 rounded border-gray-300 focus:ring-brand-primary" />
                         </label>
                          <label htmlFor="announcements" className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                             <div>
                                 <span className="font-medium">FOTY Announcements</span>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">Major updates and news from FOTY.</p>
                             </div>
-                            <input type="checkbox" id="announcements" name="announcements" checked={prefs.announcements} onChange={handlePrefsChange} className="w-5 h-5 text-brand-red bg-gray-100 rounded border-gray-300 focus:ring-brand-red" />
+                            <input type="checkbox" id="announcements" name="announcements" checked={prefs.announcements} onChange={handlePrefsChange} className="w-5 h-5 text-brand-primary bg-gray-100 rounded border-gray-300 focus:ring-brand-primary" />
                         </label>
                     </div>
                 </div>

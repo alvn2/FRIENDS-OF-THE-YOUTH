@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-// Fix: Use namespace import for 'react-router-dom' to resolve module export errors.
-import * as ReactRouterDOM from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useNotification } from '../context/NotificationContext';
 
 // The backend server URL for Google OAuth
@@ -10,9 +9,8 @@ const GOOGLE_AUTH_URL = '/api/auth/google';
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
-  // Fix: Replaced useHistory with useNavigate for react-router-dom v6.
-  const navigate = ReactRouterDOM.useNavigate();
-  const location = ReactRouterDOM.useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { addNotification } = useNotification();
   
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -20,7 +18,7 @@ const LoginPage: React.FC = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const { email, password } = formData;
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname || '/dashboard';
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -30,7 +28,6 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
     try {
       await login(email, password);
-      // Fix: Used navigate with replace option instead of history.replace.
       navigate(from, { replace: true });
     } catch (err: any) {
       const errorMessage = err.response?.data?.msg || "Login failed. Please check your credentials.";
@@ -55,22 +52,22 @@ const LoginPage: React.FC = () => {
             </h1>
             <form className="space-y-4 md:space-y-6" onSubmit={onSubmit}>
               <div>
-                <label htmlFor="login-email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                <input type="email" name="email" id="login-email" value={email} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-red focus:border-brand-red block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
+                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
+                <input type="email" name="email" id="email" value={email} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-primary focus:border-brand-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
               </div>
               <div>
                 <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                <input type="password" name="password" id="password" value={password} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-red focus:border-brand-red block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
+                <input type="password" name="password" id="password" value={password} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-primary focus:border-brand-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
               </div>
               <div className="flex items-center justify-end">
-                <ReactRouterDOM.Link
+                <Link
                   to="/forgot-password"
-                  className="text-sm font-medium text-brand-red hover:underline"
+                  className="text-sm font-medium text-brand-primary hover:underline"
                 >
                   Forgot password?
-                </ReactRouterDOM.Link>
+                </Link>
               </div>
-              <button type="submit" disabled={isLoading || isGoogleLoading} className="w-full text-white bg-brand-red hover:bg-brand-red-dark focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:bg-gray-400">
+              <button type="submit" disabled={isLoading || isGoogleLoading} className="w-full text-white bg-brand-primary hover:bg-brand-primary-dark focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:bg-gray-400">
                 {isLoading ? 'Signing in...' : 'Sign in'}
               </button>
               <div className="relative flex py-2 items-center">
@@ -95,7 +92,7 @@ const LoginPage: React.FC = () => {
                  )}
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Don’t have an account yet? <ReactRouterDOM.Link to="/register" className="font-medium text-brand-red hover:underline">Sign up</ReactRouterDOM.Link>
+                Don’t have an account yet? <Link to="/register" className="font-medium text-brand-primary hover:underline">Sign up</Link>
               </p>
             </form>
           </div>

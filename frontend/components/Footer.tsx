@@ -9,8 +9,8 @@ const Footer: React.FC = () => {
       <div className="container mx-auto p-4 sm:p-6">
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
-            <a href="#/" className="flex items-center">
-              <FotyLogo className="h-10 w-auto text-brand-red" />
+            <a href="#/" className="flex items-center h-16">
+              <FotyLogo className="h-full w-auto" />
             </a>
             <p className="mt-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs">
               Empowering the youth of Kenya through education, healthcare, and shelter.

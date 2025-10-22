@@ -20,7 +20,7 @@ const OurTeamPage: React.FC = () => {
               alt={`Photo of ${member.name}`}
             />
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">{member.name}</h3>
-            <p className="text-sm font-semibold text-brand-red mb-2">{member.title}</p>
+            <p className="text-sm font-semibold text-brand-primary mb-2">{member.title}</p>
             <p className="text-gray-600 dark:text-gray-400 text-sm">{member.bio}</p>
           </div>
         ))}

@@ -72,7 +72,7 @@ const AdminUserManagementPage: React.FC = () => {
         <div className="container mx-auto px-4 py-8">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold">User Management</h1>
-                <button onClick={() => openModal()} className="text-white bg-brand-red hover:bg-brand-red-dark font-medium rounded-lg text-sm px-5 py-2.5">
+                <button onClick={() => openModal()} className="text-white bg-brand-primary hover:bg-brand-primary-dark font-medium rounded-lg text-sm px-5 py-2.5">
                     Create User
                 </button>
             </div>
@@ -142,7 +142,7 @@ const AdminUserManagementPage: React.FC = () => {
                             </div>
                             <div className="flex justify-end gap-4 pt-4">
                                 <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium bg-gray-200 dark:bg-gray-600 rounded-lg">Cancel</button>
-                                <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-brand-red rounded-lg hover:bg-brand-red-dark">Save</button>
+                                <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-brand-primary rounded-lg hover:bg-brand-primary-dark">Save</button>
                             </div>
                         </form>
                     </div>
