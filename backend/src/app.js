@@ -18,11 +18,16 @@ const PORT = process.env.PORT || 5000;
 passportConfig(passport);
 
 // --- Core Middleware ---
+
+// --- CORS Configuration ---
 app.use(
   cors({
-    origin: process.env.CLIENT_URL, // Allow requests from your frontend
+    origin: process.env.CLIENT_URL, // Allow requests ONLY from your Vercel frontend URL defined in .env
+    credentials: true, // Allow cookies/headers (needed for JWT)
   })
 );
+// --- End CORS Configuration ---
+
 app.use(helmet()); // Set security-related HTTP headers
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
@@ -36,6 +41,13 @@ if (process.env.NODE_ENV !== 'production') {
 // --- API Routes ---
 // All API routes are prefixed with /api/v1
 app.use('/api/v1', apiRouter);
+
+// --- Simple Root Route for Health Check (Optional but helpful) ---
+app.get('/', (req, res) => {
+  res.send(`FOTY Backend is running. Visit /api/v1/health for status.`);
+});
+// --- End Root Route ---
+
 
 // --- Error Handling Middleware ---
 
@@ -61,18 +73,15 @@ app.use((err, req, res, next) => {
 });
 
 // --- Start Server ---
-app.listen(PORT, () => {
+app.listen(PORT, async () => { // Make the listener async
   console.log(`[Server] 🚀 Server running on http://localhost:${PORT}`);
-  // Log database connection
-  prisma.$connect()
-    .then(() => {
-      console.log('[Database] 💾 Prisma client initialized.');
-    })
-    .catch((err) => {
-      console.error('[Database] ❌ Error connecting to database:', err);
-    });
+  try {
+    await prisma.$connect();
+    console.log('[Database] 💾 Prisma client connected successfully.');
+  } catch (err) {
+    console.error('[Database] ❌ Error connecting to database:', err);
+  }
   
   // Start the scheduled newsletter jobs
   startNewsletterJob();
 });
-
