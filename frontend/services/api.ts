@@ -1,10 +1,15 @@
+// src/services/api.ts
+
 import axios from 'axios';
 
-// The base URL should point to your backend server via the proxy
-// '/api' will be proxied to 'http://localhost:5000/api/v1' by the corrected vite.config.ts
-const API_URL = '/api'; 
+// 1. Get the LIVE backend URL from Vercel's environment variables
+//    IF in production, use the live URL.
+//    IF in development, use the local proxy '/api'.
+const API_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
-const apiClient = axios.create({ 
+console.log("API Base URL:", API_URL); // For debugging
+
+const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -14,14 +19,10 @@ const apiClient = axios.create({
 // Interceptor to add the standard Authorization: Bearer token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token'); 
+    const token = localStorage.getItem('token');
     if (token) {
-      // --- Use standard Bearer token ---
-      config.headers['Authorization'] = `Bearer ${token}`; 
-      // ---------------------------------
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
-     // Clean up old header if present
-    delete config.headers['x-auth-token'];
     return config;
   },
   (error) => {
@@ -29,26 +30,20 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor (keep as is, looks correct)
+// Response interceptor (to handle 401 errors)
 apiClient.interceptors.response.use(
-  (response) => response, 
+  (response) => response,
   (error) => {
-    if (error.response) {
-      if (error.response.status === 401) {
-        console.error("Authentication Error (401): Logging out.");
-        localStorage.removeItem('token'); 
-        if (window.location.hash !== '#/login') {
-            window.location.href = '#/login'; 
-        }
+    if (error.response && error.response.status === 401) {
+      console.error("Authentication Error (401): Logging out.");
+      localStorage.removeItem('token');
+      // Use hash router navigation for logout
+      if (window.location.hash !== '#/login') {
+        window.location.hash = '#/login';
       }
-    } else if (error.request) {
-      console.error("Network Error: Could not reach backend.", error.message);
-    } else {
-      console.error('Axios Error:', error.message);
     }
     return Promise.reject(error);
   }
 );
 
 export default apiClient;
-

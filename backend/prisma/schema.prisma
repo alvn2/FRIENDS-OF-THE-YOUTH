@@ -1,13 +1,128 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// datasource db defines the database connection details.
+datasource db {
+  provider = "postgresql" // or your database provider
+  url      = env("DATABASE_URL")
+}
 
+// generator client specifies that Prisma Client should be generated.
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+// --- User Model ---
+model User {
+  id           String    @id @default(cuid()) // Unique ID for the user
+  name         String
+  email        String    @unique // Email must be unique
+  password     String    // Hashed password
+  phone        String?   // Optional phone number
+  bio          String?   @db.Text // Optional longer bio
+  role         UserRole  @default(USER) // Role: USER or ADMIN
+  createdAt    DateTime  @default(now()) // Timestamp of creation
+  updatedAt    DateTime  @updatedAt // Timestamp of last update
+
+  // Optional OAuth details
+  authProvider AuthProvider?
+  providerId   String?     @unique // Unique ID from the OAuth provider (e.g., Google ID)
+
+  // Newsletter subscription status
+  newsletter   NewsletterSubscription?
+
+  // Relations
+  badges    UserBadge[]     // Badges awarded to the user
+  posts     BulletinPost[]  // Posts created by the user
+  donations Donation[]      // Donations made by the user
+  rsvps     EventRSVP[]     // Events the user RSVPd for
+
+  // Add unique constraint for providerId if needed, depending on OAuth strategy
+  // @@unique([authProvider, providerId]) 
+}
+
+// --- Badge Model ---
+model Badge {
+  id          String      @id @default(cuid())
+  name        String      @unique // <-- *** ENSURE THIS @unique IS PRESENT ***
+  description String
+  iconUrl     String      // URL or path to the badge icon
+  createdAt   DateTime    @default(now())
+
+  // Relations
+  users       UserBadge[] // Users who have earned this badge
+}
+
+// --- UserBadge Model (Join Table) ---
+// Represents a user having earned a specific badge
+model UserBadge {
+  userId    String
+  badgeId   String
+  awardedAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, badgeId]) // Composite primary key
+}
+
+
+// --- Bulletin Post Model ---
+model BulletinPost {
+  id        String   @id @default(cuid())
+  title     String   @unique // Make title unique for easier upsert/lookup
+  content   String   @db.Text
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+// --- Event Model ---
+model Event {
+  id          String      @id @default(cuid())
+  name        String      @unique // Event name should be unique
+  description String      @db.Text
+  date        DateTime
+  location    String
+  imageUrl    String?     // Optional image URL
+  capacity    Int?        // Optional attendee capacity
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  rsvps       EventRSVP[] // RSVPs for this event
+}
+
+// --- EventRSVP Model (Join Table) ---
+// Represents a user RSVPing for an event
+model EventRSVP {
+  userId    String
+  eventId   String
+  rsvpAt    DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([userId, eventId]) // Composite primary key
+}
+
+
+// --- Donation Model ---
+model Donation {
+  id                String          @id @default(cuid())
+  amount            Int
+  phone             String          // Phone number used for M-Pesa
+  status            DonationStatus  @default(PENDING) // PENDING, COMPLETED, FAILED
+  checkoutRequestId String?         @unique // M-Pesa CheckoutRequestID
+  mpesaReceipt      String?         // M-Pesa Receipt Number (if successful)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Optional relation to user (for logged-in donations)
+  userId            String?
+  user              User?           @relation(fields: [userId], references: [id], onDelete: SetNull) // SetNull: Keep donation record if user deleted
 }
 
 // --- Enums ---
@@ -18,9 +133,15 @@ enum UserRole {
 }
 
 enum AuthProvider {
-  EMAIL
   GOOGLE
-  X
+  X // (formerly Twitter)
+  // Add more as needed
+}
+
+enum NewsletterSubscription {
+  NONE   // Keep NONE or null for unsubscribed
+  DAILY
+  WEEKLY
 }
 
 enum DonationStatus {
@@ -28,119 +149,3 @@ enum DonationStatus {
   COMPLETED
   FAILED
 }
-
-enum NewsletterSubscription {
-  DAILY
-  WEEKLY
-  NONE
-}
-
-// --- Models ---
-
-model User {
-  id           String        @id @default(cuid())
-  email        String        @unique
-  name         String
-  password     String? // Optional for social logins
-  role         UserRole      @default(USER)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  authProvider AuthProvider  @default(EMAIL)
-  providerId   String?       @unique
-  newsletter   NewsletterSubscription?
-  phone        String?
-  bio          String?
-
-  // Relations
-  badges    UserBadge[]
-  posts     BulletinPost[]
-  donations Donation[]
-  rsvps     EventRSVP[]
-
-  @@map("users")
-}
-
-model Badge {
-  id          String      @id @default(cuid())
-  name        String      @unique
-  description String
-  iconUrl     String
-  createdAt   DateTime    @default(now())
-  users       UserBadge[]
-
-  @@map("badges")
-}
-
-model UserBadge {
-  id        String   @id @default(cuid())
-  userId    String
-  badgeId   String
-  assignedAt DateTime @default(now())
-
-  // Relations
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, badgeId])
-  @@map("user_badges")
-}
-
-model BulletinPost {
-  id        String   @id @default(cuid())
-  title     String   @unique // <-- THIS IS THE FIX
-  content   String   @db.Text
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
-
-  @@map("bulletin_posts")
-}
-
-model Event {
-  id          String      @id @default(cuid())
-  name        String      @unique
-  description String      @db.Text
-  date        DateTime
-  location    String
-  capacity    Int?
-  imageUrl    String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  rsvps       EventRSVP[]
-
-  @@map("events")
-}
-
-model EventRSVP {
-  id      String @id @default(cuid())
-  userId  String
-  eventId String
-
-  // Relations
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, eventId])
-  @@map("event_rsvps")
-}
-
-model Donation {
-  id                String         @id @default(cuid())
-  amount            Int
-  phone             String
-  status            DonationStatus @default(PENDING)
-  checkoutRequestId String         @unique
-  mpesaReceipt      String?
-  userId            String?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-
-  // Relations
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@map("donations")
-}
-

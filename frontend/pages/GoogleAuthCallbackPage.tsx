@@ -1,43 +1,43 @@
 import React, { useEffect } from 'react';
-// Import useNavigate and useLocation from react-router-dom
 import { useNavigate, useLocation } from 'react-router-dom';
-// --- FIX: Added .tsx extension to the import path ---
-import { useNotification } from '../context/NotificationContext.tsx'; 
-// ---------------------------------------------------
+import { useNotification } from '../context/NotificationContext';
+// Import useAuth to manually trigger the token set
+import { useAuth } from '../context/AuthContext';
 
 const GoogleAuthCallbackPage: React.FC = () => {
-  const navigate = useNavigate(); // Use the hook
-  const location = useLocation(); // Use the hook to get location
+  const navigate = useNavigate();
+  const location = useLocation();
   const { addNotification } = useNotification();
+  // We can't use useAuth() here to set the token, as AuthProvider is what's loading.
+  // The AuthProvider itself is designed to find this token.
 
   useEffect(() => {
-    // Use URLSearchParams directly on location.search
+    // AuthProvider's Effect 1 is already built to look for this token
+    // in the URL. All we need to do is redirect to the dashboard.
+    // The AuthProvider will handle the token and log the user in.
+    
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
-    const error = params.get('error'); // Check if the backend sent an error
+    const error = params.get('error');
 
     if (error) {
       addNotification(`Google login failed: ${error}`, 'error');
       navigate('/login');
     } else if (token) {
-      console.log("Token received via Google, saving:", token); // Add logging
-      // Save token with the correct key
-      localStorage.setItem('token', token); 
-      
-      // Use navigate instead of window.location
-      navigate('/dashboard', { replace: true }); 
-
+      // The AuthProvider (in Effect 1) will find this token and save it.
+      // We just need to navigate to the dashboard, and the AuthProvider
+      // will see the token, fetch the user, and log us in.
+      navigate('/dashboard', { replace: true });
     } else {
       addNotification('Google authentication failed. No token or error received.', 'error');
       navigate('/login');
     }
-    // Add location to dependency array as we read from it
-  }, [location, navigate, addNotification]); 
+  }, [location, navigate, addNotification]);
 
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-brand-red mx-auto"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-brand-primary mx-auto"></div>
         <p className="mt-4 text-lg">Finalizing your login...</p>
       </div>
     </div>
@@ -45,4 +45,3 @@ const GoogleAuthCallbackPage: React.FC = () => {
 };
 
 export default GoogleAuthCallbackPage;
-

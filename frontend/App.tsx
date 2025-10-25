@@ -34,21 +34,17 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
-// Corrected this path from 'pagesV' to 'pages'
 import TermsAndConditionsPage from './pages/TermsAndConditionsPage'; 
 import ReportsPage from './pages/ReportsPage';
 import PartnershipsPage from './pages/PartnershipsPage';
 import CareersPage from './pages/CareersPage';
 import WhatsAppBubble from './components/WhatsAppBubble';
 
-// --- 1. IMPORT THE AUTH PROVIDER ---
-import { AuthProvider } from './context/AuthContext';
-
+// --- REMOVED AuthProvider from here, as it's already in index.tsx ---
 
 const App: React.FC = () => {
   return (
-    // --- 2. WRAP YOUR APP IN THE AUTH PROVIDER ---
-    <AuthProvider>
+    // --- AuthProvider is no longer here ---
       <ThemeProvider>
         <NotificationProvider>
           <div className="flex flex-col min-h-screen bg-white dark:bg-dark-bg text-light-text dark:text-dark-text">
@@ -78,8 +74,8 @@ const App: React.FC = () => {
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
                   <Route path="/register-success" element={<RegisterSuccessPage />} />
-                  {/* This route is correct based on your file */}
-                  <Route path="/auth/google/callback" element={<GoogleAuthCallbackPage />} />
+                  {/* This route path matches the backend redirect URL */}
+                  <Route path="/auth-success" element={<GoogleAuthCallbackPage />} />
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                   <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
@@ -120,7 +116,7 @@ const App: React.FC = () => {
                   <Route
                     path="/admin"
                     element={
-                      <PrivateRoute role="admin">
+                      <PrivateRoute role="ADMIN">
                         <UserManagementProvider>
                           <AdminDashboard />
                         </UserManagementProvider>
@@ -130,22 +126,23 @@ const App: React.FC = () => {
                   <Route
                     path="/admin/users"
                     element={
-                      <PrivateRoute role="admin">
+                      <PrivateRoute role="ADMIN">
                         <UserManagementProvider>
                           <AdminUserManagementPage />
                         </UserManagementProvider>
                       </PrivateRoute>
                     }
                   />
+             // src/App.tsx (around line 138)
+
                   <Route
                     path="/admin/volunteers"
                     element={
-                      <PrivateRoute role="admin">
+                      <PrivateRoute role="ADMIN">
                         <AdminVolunteerLogPage />
-                      </PrivateRoute>
+                      </PrivateRoute> // <-- Change this line from </Route>
                     }
                   />
-
                   {/* Catch-all 404 Route */}
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
@@ -157,9 +154,8 @@ const App: React.FC = () => {
           </div>
         </NotificationProvider>
       </ThemeProvider>
-    </AuthProvider>
+    // --- AuthProvider is no longer here ---
   );
 };
 
 export default App;
-

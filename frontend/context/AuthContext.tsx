@@ -1,38 +1,38 @@
+// src/context/AuthContext.tsx
+
 import React, {
   createContext,
   useContext,
   useState,
   useEffect,
   ReactNode,
-  useCallback // Import useCallback
 } from 'react';
-// --- FIX: Correct relative path based on structure ---
-import apiClient from '../services/api'; 
-// ----------------------------------------------------
+import apiClient from '../services/api';
 
-// Define the shape of your User object (match backend response)
-// Ensure this matches the SELECT in backend middleware and controllers
+// Define the shape of your User object (from /users/profile)
 interface User {
   id: string;
   name: string;
   email: string;
   role: 'USER' | 'ADMIN';
-  phone?: string | null; 
-  bio?: string | null;   
-  badges?: Array<any>; // Define more specific types if needed
-  donations?: Array<any>;
-  rsvps?: Array<any>;
-  // Add other fields returned by backend profile route if necessary
+  phone?: string | null;
+  bio?: string | null;
+  // This matches the shape from your backend middleware.js file
+  badges?: Array<{ awardedAt: string; badge: { id: string; name: string; description: string; iconUrl: string } }>;
+  donations?: Array<{ id: string; amount: number; createdAt: string; status: string }>;
+  rsvps?: Array<{ rsvpAt: string; event: { id: string; name: string; date: string } }>;
 }
 
 // Define the shape of the context
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  isLoading: boolean; 
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, phone: string) => Promise<void>;
   logout: () => void;
+  // This function is for your SettingsPage to update the user in the context
+  refetchUser: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,11 +42,11 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | undefined>(undefined); // Start as undefined
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Initial Load and Token Handling
+  // Effect 1: Runs ONCE on app load to check for existing token
   useEffect(() => {
     console.log("[DEBUG] AuthProvider Mount: Initial check.");
     let initialToken: string | null = null;
@@ -54,9 +54,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const searchParams = new URLSearchParams(window.location.search);
     let urlToken = searchParams.get('token');
 
+    // Handle tokens in hash (from Google Redirect)
     if (!urlToken && fullUrl.includes('#') && fullUrl.includes('?')) {
       const hashPart = fullUrl.split('#')[1];
-      const hashQueryString = hashPart.split('?')[1]; 
+      const hashQueryString = hashPart.split('?')[1];
       if (hashQueryString) {
         const hashParams = new URLSearchParams(hashQueryString);
         urlToken = hashParams.get('token');
@@ -67,120 +68,130 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (urlToken) {
       console.log("[DEBUG] AuthProvider Mount: Using token from URL.");
       initialToken = urlToken;
-      localStorage.setItem('token', initialToken); 
+      localStorage.setItem('token', initialToken);
+      // Clean the token from the URL
       const pathBeforeHash = window.location.pathname;
-      const hashPath = window.location.hash.split('?')[0]; 
+      const hashPath = window.location.hash.split('?')[0];
       window.history.replaceState({}, document.title, pathBeforeHash + hashPath);
     } else {
+      // No URL token, check localStorage
       initialToken = localStorage.getItem('token');
       console.log("[DEBUG] AuthProvider Mount: No URL token. Token from localStorage:", initialToken);
     }
 
+    // Set the token state. This will trigger Effect 2.
     setToken(initialToken);
-    
+
+    // If there's no token at all, we're done loading.
     if (!initialToken) {
         console.log("[DEBUG] AuthProvider Mount: No initial token. Setting isLoading=false.");
         setIsLoading(false);
-        setUser(null); 
+        setUser(null);
     }
+  }, []);
 
-  }, []); 
-
-  // User Fetching Effect
+  // Effect 2: Runs whenever the 'token' state changes.
+  // This is now the SINGLE SOURCE OF TRUTH for fetching user data.
   useEffect(() => {
     const loadUserFromToken = async () => {
-      const currentTokenInState = token;
-      console.log("[DEBUG] AuthProvider (useEffect[token]): Token changed, checking state:", currentTokenInState);
-
-      if (currentTokenInState) {
-         if (!isLoading) setIsLoading(true); 
-         
-         try {
-           console.log("[DEBUG] AuthProvider (useEffect[token]): Attempting to fetch profile...");
-           // Use '/users/profile' - proxy prepends '/api/v1'
-           const response = await apiClient.get('/users/profile'); 
-           console.log("[DEBUG] AuthProvider (useEffect[token]): Profile fetched successfully:", response.data.data);
-           setUser(response.data.data); 
-           console.log("[DEBUG] AuthProvider (useEffect[token]): Setting isLoading=false after successful fetch.");
-           setIsLoading(false); 
-         } catch (error: any) {
-           console.error('[DEBUG] AuthProvider (useEffect[token]): Failed to fetch profile:', error.response?.data || error.message);
-           localStorage.removeItem('token');
-           setUser(null); 
-           setToken(null); 
-           console.log("[DEBUG] AuthProvider (useEffect[token]): Setting isLoading=false after failed fetch.");
-           setIsLoading(false); 
-         }
-      } else {
-          console.log("[DEBUG] AuthProvider (useEffect[token]): Token is null. Ensuring user is null and isLoading=false.");
+      // Only run if token is a string (not undefined or null)
+      if (typeof token === 'string' && token) {
+        console.log("[DEBUG] AuthProvider (useEffect[token]): Token exists. Fetching profile...");
+        setIsLoading(true); // Set loading true *before* the fetch
+        try {
+          // The apiClient interceptor will automatically add the 'Bearer' header
+          const response = await apiClient.get('/users/profile');
+          console.log("[DEBUG] AuthProvider (useEffect[token]): Profile fetched:", response.data.data);
+          setUser(response.data.data);
+        } catch (error: any) {
+          console.error('[DEBUG] AuthProvider (useEffect[token]): Failed to fetch profile. Logging out.', error.response?.data || error.message);
+          // The 401 interceptor in api.ts will catch this, but this is a good fallback.
+          localStorage.removeItem('token');
           setUser(null);
-          if (isLoading) setIsLoading(false); 
+          setToken(null);
+        } finally {
+          console.log("[DEBUG] AuthProvider (useEffect[token]): Fetch finished. Setting isLoading=false.");
+          setIsLoading(false);
+        }
+      } else if (token === null) { // Only run if token is explicitly null (meaning logged out or invalid)
+        // If token is null, ensure user is null and we are not loading.
+        console.log("[DEBUG] AuthProvider (useEffect[token]): Token is null. Ensuring user is null.");
+        setUser(null);
+        setIsLoading(false);
       }
+      // If token is still `undefined`, we're waiting for Effect 1 to run.
     };
-    
-    if (token !== undefined) { 
-        loadUserFromToken();
+
+    // We check `token !== undefined` to avoid running on the initial `undefined` state
+    if (token !== undefined) {
+      loadUserFromToken();
     }
+  }, [token]);
 
-  }, [token]); 
-
-
+  // login() is now only responsible for getting and setting the TOKEN.
   const login = async (email: string, password: string) => {
-      console.log("[DEBUG] AuthContext: Attempting login...");
-      setIsLoading(true); 
-      try {
-        // Use '/auth/login' - proxy prepends '/api/v1'
-        const response = await apiClient.post('/auth/login', { email, password }); 
-        const { token: newToken, user: loggedInUser } = response.data;
-        console.log("[DEBUG] AuthContext: Login successful. Setting token and user state immediately:", newToken, loggedInUser);
-        localStorage.setItem('token', newToken);
-        setUser(loggedInUser); 
-        setToken(newToken); 
-      } catch (error) {
-        console.error("[DEBUG] AuthContext: Login failed:", error);
-        setUser(null); 
-        setToken(null);
-        setIsLoading(false); 
-        throw error; 
-      }
+    console.log("[DEBUG] AuthContext: Attempting login...");
+    setIsLoading(true); // Set loading to true immediately
+    try {
+      const response = await apiClient.post('/auth/login', { email, password });
+      const { token: newToken } = response.data;
+
+      console.log("[DEBUG] AuthContext: Login successful. Setting token.");
+      localStorage.setItem('token', newToken);
+      setToken(newToken); // This will trigger Effect 2 to fetch the user
+    } catch (error) {
+      console.error("[DEBUG] AuthContext: Login failed:", error);
+      localStorage.removeItem('token');
+      setUser(null);
+      setToken(null);
+      setIsLoading(false); // Make sure to stop loading on error
+      throw error;
+    }
   };
 
+  // register() is now only responsible for getting and setting the TOKEN.
   const register = async (name: string, email: string, password: string, phone: string) => {
     console.log("[DEBUG] AuthContext: Attempting registration...");
-    setIsLoading(true); 
+    setIsLoading(true); // Set loading to true immediately
     try {
-       // Use '/auth/register' - proxy prepends '/api/v1'
-      const response = await apiClient.post('/auth/register', { name, email, password, phone }); 
-      const { token: newToken, user: newUser } = response.data;
-      console.log("[DEBUG] AuthContext: Registration successful. Setting token and user state immediately:", newToken, newUser);
+      const response = await apiClient.post('/auth/register', { name, email, password, phone });
+      const { token: newToken } = response.data;
+
+      console.log("[DEBUG] AuthContext: Registration successful. Setting token.");
       localStorage.setItem('token', newToken);
-      setUser(newUser); 
-      setToken(newToken); 
+      setToken(newToken); // This will trigger Effect 2 to fetch the user
     } catch (error: any) {
-        console.error("[DEBUG] AuthContext: Registration failed - Backend Response:", error.response?.data || error.message);
-        setUser(null); 
-        setToken(null);
-        setIsLoading(false); 
-        throw error; 
+      console.error("[DEBUG] AuthContext: Registration failed:", error.response?.data || error.message);
+      localStorage.removeItem('token');
+      setUser(null);
+      setToken(null);
+      setIsLoading(false); // Make sure to stop loading on error
+      throw error;
     }
   };
 
   const logout = () => {
     console.log("[DEBUG] AuthContext: Logging out.");
-    setIsLoading(true); 
     localStorage.removeItem('token');
-    setUser(null); 
-    setToken(null); 
-    window.location.href = '#/login'; 
+    setUser(null);
+    setToken(null);
+    window.location.hash = '/login';
   };
 
+  // Allows SettingsPage to refetch the user after an update
+  const refetchUser = () => {
+    console.log("[DEBUG] AuthContext: Forcing user refetch.");
+    setToken(localStorage.getItem('token'));
+  };
+
+  // Log state changes for easier debugging
   useEffect(() => {
     console.log("%c[DEBUG] AuthContext State Change:", "color: blue; font-weight: bold;", { user: user ? user.email : null, token: token ? '***' : null, isLoading });
   }, [user, token, isLoading]);
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
-       {isLoading ? <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '1.2em'}}>Verifying Session...</div> : children}
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, refetchUser }}>
+      {children}
     </AuthContext.Provider>
   );
 };
@@ -192,4 +203,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

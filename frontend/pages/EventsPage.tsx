@@ -1,10 +1,12 @@
+// src/pages/EventsPage.tsx
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { EVENTS_DATA } from '../constants';
 import { useAuth } from '../context/AuthContext';
 
 const EventsPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth(); // <-- THIS IS THE FIX (was 'isAuthenticated')
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
@@ -25,7 +27,7 @@ const EventsPage: React.FC = () => {
                 <span className="font-semibold">{event.date}</span> @ {event.location}
               </p>
               <p className="text-gray-600 dark:text-gray-300 mb-6">{event.description}</p>
-              {isAuthenticated ? (
+              {user ? ( // <-- THIS IS THE FIX (was 'isAuthenticated')
                 <Link 
                   to={`/events/${event.id}`}
                   className="inline-block text-white bg-brand-primary hover:bg-brand-primary-dark focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors duration-300"

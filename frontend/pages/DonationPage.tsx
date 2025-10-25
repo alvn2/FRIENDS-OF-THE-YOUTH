@@ -1,17 +1,20 @@
+// src/pages/DonationPage.tsx
+
 import React, { useState, useEffect } from 'react';
+// --- FIX: Import refetchUser ---
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-import { ACHIEVEMENTS_DATA } from '../constants';
+// ACHIEVEMENTS_DATA is no longer needed here
+// import { ACHIEVEMENTS_DATA } from '../constants';
 import api from '../services/api';
 
-// --- SVG Icons ---
+// --- SVG Icons (Keep these as they are) ---
 const MpesaLogo: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} viewBox="0 0 250 100" xmlns="http://www.w3.org/2000/svg">
       <rect width="250" height="100" rx="10" fill="#A4C639" />
       <text x="125" y="65" fontFamily="Arial, sans-serif" fontSize="50" fontWeight="bold" fill="white" textAnchor="middle">M-PESA</text>
     </svg>
 );
-
 const PendingIcon: React.FC = () => (
     <div className="animate-pulse">
         <svg className="w-16 h-16 mx-auto text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -20,30 +23,31 @@ const PendingIcon: React.FC = () => (
         </svg>
     </div>
 );
-
 const SuccessIcon: React.FC = () => (
     <svg className="w-16 h-16 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
 );
-
 const ErrorIcon: React.FC = () => (
     <svg className="w-16 h-16 mx-auto text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
 );
+// --- End SVG Icons ---
 
 
 const DonationPage: React.FC = () => {
-  const { user, addAchievement } = useAuth();
+  // --- FIX: Get refetchUser from context ---
+  const { user, refetchUser } = useAuth();
   const { addNotification } = useNotification();
   const [amount, setAmount] = useState(2500);
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [donationStatus, setDonationStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
-  
+
   useEffect(() => {
-    if (user && user.phone) {
+    // Pre-fill phone if user is logged in and has one
+    if (user?.phone) {
         setPhone(user.phone);
     }
   }, [user]);
@@ -56,24 +60,9 @@ const DonationPage: React.FC = () => {
     const value = parseInt(e.target.value, 10);
     setAmount(isNaN(value) ? 0 : value);
   };
-  
-  const awardAchievements = async () => {
-    if (user) {
-        const firstDonationAchievement = ACHIEVEMENTS_DATA.find(a => a.id === 'first_donation');
-        if (firstDonationAchievement) {
-            await addAchievement(firstDonationAchievement);
-            addNotification(`Achievement Unlocked: ${firstDonationAchievement.name}!`, 'success', { persistent: true, persistentType: 'achievement', link: '/settings' });
-        }
 
-        if (amount >= 10000) {
-            const generousGiverAchievement = ACHIEVEMENTS_DATA.find(a => a.id === 'generous_giver');
-            if (generousGiverAchievement) {
-                await addAchievement(generousGiverAchievement);
-                addNotification(`Achievement Unlocked: ${generousGiverAchievement.name}!`, 'success', { persistent: true, persistentType: 'achievement', link: '/settings' });
-            }
-        }
-    }
-  };
+  // --- FIX: Removed awardAchievements function ---
+  // Achievements are handled by the backend.
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,33 +72,40 @@ const DonationPage: React.FC = () => {
     const donationData = { phone, amount };
 
     try {
-        // This simulates a call to a backend that uses the Daraja API to initiate an STK push.
+        // Initiate STK Push via backend
         await api.post('/donations/initiate-mpesa', donationData);
         addNotification('Request sent! Check your phone for a PIN prompt.', 'info');
-        
+
         // SIMULATE backend callback after user enters PIN.
-        // In a real app, this would be handled by a WebSocket or polling for status.
+        // In a real app, this success state would be triggered by backend confirmation (e.g., WebSocket).
         setTimeout(() => {
             setDonationStatus('success');
             setIsLoading(false);
-            awardAchievements();
-        }, 15000); // 15-second simulation for user to find phone and enter PIN.
-        
+            addNotification('Donation received successfully! Thank you!', 'success');
+            // --- FIX: Refetch user data to potentially see new badges ---
+            if (user) {
+              refetchUser();
+            }
+            // We no longer call awardAchievements here
+        }, 15000); // 15-second simulation
+
     } catch (err: any) {
-        addNotification(err.response?.data?.msg || 'Failed to initiate payment. Please check the phone number.', 'error');
+        addNotification(err.response?.data?.message || 'Failed to initiate payment. Please check the phone number.', 'error');
         setIsLoading(false);
         setDonationStatus('error');
     }
   };
-  
+
   const resetDonationForm = () => {
       setDonationStatus('idle');
       setAmount(2500);
+      // Reset phone only if user doesn't have one pre-filled
       if (!user?.phone) {
           setPhone('');
       }
   };
 
+  // --- Render logic remains the same ---
   const renderContent = () => {
     switch (donationStatus) {
       case 'pending':
@@ -162,14 +158,14 @@ const DonationPage: React.FC = () => {
                 </div>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">KES</span>
-                  <input type="number" value={amount} onChange={handleCustomAmountChange} className="w-full pl-12 p-3 bg-gray-50 dark:bg-gray-800 border dark:border-gray-600 rounded-lg" placeholder="Custom Amount" required />
+                  <input type="number" value={amount} onChange={handleCustomAmountChange} className="w-full pl-12 p-3 bg-gray-50 dark:bg-gray-800 border dark:border-gray-600 rounded-lg" placeholder="Custom Amount" required min="1" /> {/* Added min="1" */}
                 </div>
               </div>
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium mb-1">M-Pesa Phone Number</label>
-                <input type="tel" name="phone" id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full p-2.5 bg-gray-50 dark:bg-gray-800 border dark:border-gray-600 rounded-lg" required placeholder="e.g. 0712345678" />
+                <input type="tel" name="phone" id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full p-2.5 bg-gray-50 dark:bg-gray-800 border dark:border-gray-600 rounded-lg" required placeholder="e.g. 0712345678 or 254712345678" pattern="^(07|\+?2547)\d{8}$" title="Enter a valid Kenyan number like 07... or 2547..."/> {/* Updated pattern and placeholder */}
               </div>
-              <button type="submit" disabled={isLoading} className="w-full py-3 px-5 text-lg font-medium text-white rounded-lg bg-brand-primary hover:bg-brand-primary-dark disabled:bg-gray-400">
+              <button type="submit" disabled={isLoading || amount <= 0} className="w-full py-3 px-5 text-lg font-medium text-white rounded-lg bg-brand-primary hover:bg-brand-primary-dark disabled:bg-gray-400">
                 {isLoading ? 'Processing...' : `Donate KES ${amount.toLocaleString()}`}
               </button>
             </form>
