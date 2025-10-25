@@ -1,21 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react'; // <-- CORRECTED IMPORT SYNTAX
+// Corrected import paths
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useNotification } from '../context/NotificationContext';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
-// The backend server URL for Google OAuth
-const GOOGLE_AUTH_URL = '/api/auth/google';
-
+// No need for BACKEND_URL here anymore if proxy is correct
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { addNotification } = useNotification();
-  
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const [formData, setFormData] = React.useState({ email: '', password: '' });
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
 
   const { email, password } = formData;
   const from = location.state?.from?.pathname || '/dashboard';
@@ -30,18 +29,21 @@ const LoginPage: React.FC = () => {
       await login(email, password);
       navigate(from, { replace: true });
     } catch (err: any) {
-      const errorMessage = err.response?.data?.msg || "Login failed. Please check your credentials.";
+      const errorMessage = err.response?.data?.message || err.message || "Login failed.";
       addNotification(errorMessage, 'error');
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
-  
+
   const handleGoogleLogin = () => {
     setIsGoogleLoading(true);
-    // Redirect to the backend endpoint for Google authentication
-    window.location.href = GOOGLE_AUTH_URL;
+    // --- FIX: Use the proxied path ---
+    window.location.href = '/api/auth/google'; 
+    // ---------------------------------
   };
 
+  // --- Rest of the component's JSX remains the same ---
+  // ... (JSX for the form, Google button, etc.) ...
   return (
     <section className="bg-white dark:bg-dark-bg">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:py-16">
@@ -52,12 +54,12 @@ const LoginPage: React.FC = () => {
             </h1>
             <form className="space-y-4 md:space-y-6" onSubmit={onSubmit}>
               <div>
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                <input type="email" name="email" id="email" value={email} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-primary focus:border-brand-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
+                <label htmlFor="login-email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
+                <input type="email" name="email" id="login-email" value={email} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-primary focus:border-brand-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
               </div>
               <div>
-                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                <input type="password" name="password" id="password" value={password} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-primary focus:border-brand-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
+                <label htmlFor="login-password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                <input type="password" name="password" id="login-password" value={password} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-brand-primary focus:border-brand-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
               </div>
               <div className="flex items-center justify-end">
                 <Link
@@ -103,3 +105,4 @@ const LoginPage: React.FC = () => {
 };
 
 export default LoginPage;
+

@@ -34,123 +34,132 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
-import TermsAndConditionsPage from './pages/TermsAndConditionsPage';
+// Corrected this path from 'pagesV' to 'pages'
+import TermsAndConditionsPage from './pages/TermsAndConditionsPage'; 
 import ReportsPage from './pages/ReportsPage';
 import PartnershipsPage from './pages/PartnershipsPage';
 import CareersPage from './pages/CareersPage';
 import WhatsAppBubble from './components/WhatsAppBubble';
 
+// --- 1. IMPORT THE AUTH PROVIDER ---
+import { AuthProvider } from './context/AuthContext';
+
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider>
-      <NotificationProvider>
-        <div className="flex flex-col min-h-screen bg-white dark:bg-dark-bg text-light-text dark:text-dark-text">
-          <Header />
-          <main className="flex-grow">
-            <ErrorBoundary>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<HomePage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/team" element={<OurTeamPage />} />
-                <Route path="/reach" element={<OurReachPage />} />
-                <Route path="/events" element={<EventsPage />} />
-                <Route path="/news" element={<NewsPage />} />
-                <Route path="/news/:id" element={<NewsDetailPage />} />
-                <Route path="/community" element={<CommunityPage />} />
-                <Route path="/volunteer" element={<VolunteerPage />} />
-                <Route path="/faq" element={<FAQPage />} />
-                <Route path="/donate" element={<DonationPage />} />
-                <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
-                <Route path="/reports" element={<ReportsPage />} />
-                <Route path="/partnerships" element={<PartnershipsPage />} />
-                <Route path="/careers" element={<CareersPage />} />
+    // --- 2. WRAP YOUR APP IN THE AUTH PROVIDER ---
+    <AuthProvider>
+      <ThemeProvider>
+        <NotificationProvider>
+          <div className="flex flex-col min-h-screen bg-white dark:bg-dark-bg text-light-text dark:text-dark-text">
+            <Header />
+            <main className="flex-grow">
+              <ErrorBoundary>
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/team" element={<OurTeamPage />} />
+                  <Route path="/reach" element={<OurReachPage />} />
+                  <Route path="/events" element={<EventsPage />} />
+                  <Route path="/news" element={<NewsPage />} />
+                  <Route path="/news/:id" element={<NewsDetailPage />} />
+                  <Route path="/community" element={<CommunityPage />} />
+                  <Route path="/volunteer" element={<VolunteerPage />} />
+                  <Route path="/faq" element={<FAQPage />} />
+                  <Route path="/donate" element={<DonationPage />} />
+                  <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
+                  <Route path="/reports" element={<ReportsPage />} />
+                  <Route path="/partnerships" element={<PartnershipsPage />} />
+                  <Route path="/careers" element={<CareersPage />} />
 
-                {/* Auth Routes */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/register-success" element={<RegisterSuccessPage />} />
-                <Route path="/auth/google/callback" element={<GoogleAuthCallbackPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+                  {/* Auth Routes */}
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/register-success" element={<RegisterSuccessPage />} />
+                  {/* This route is correct based on your file */}
+                  <Route path="/auth/google/callback" element={<GoogleAuthCallbackPage />} />
+                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
 
-                {/* Private Routes */}
-                <Route 
-                  path="/events/:id" 
-                  element={
-                    <PrivateRoute>
-                      <EventDetailPage />
-                    </PrivateRoute>
-                  } 
-                />
-                <Route 
-                  path="/dashboard" 
-                  element={
-                    <PrivateRoute>
-                      <DashboardPage />
-                    </PrivateRoute>
-                  } 
-                />
-                 <Route 
-                  path="/settings" 
-                  element={
-                    <PrivateRoute>
-                      <SettingsPage />
-                    </PrivateRoute>
-                  } 
-                />
-                 <Route 
-                  path="/notifications" 
-                  element={
-                    <PrivateRoute>
-                      <NotificationsPage />
-                    </PrivateRoute>
-                  } 
-                />
-                <Route
-                  path="/admin"
-                  element={
-                    <PrivateRoute role="admin">
-                      <UserManagementProvider>
-                        <AdminDashboard />
-                      </UserManagementProvider>
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/admin/users"
-                  element={
-                    <PrivateRoute role="admin">
-                      <UserManagementProvider>
-                        <AdminUserManagementPage />
-                      </UserManagementProvider>
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/admin/volunteers"
-                  element={
-                    <PrivateRoute role="admin">
-                      <AdminVolunteerLogPage />
-                    </PrivateRoute>
-                  }
-                />
+                  {/* Private Routes */}
+                  <Route 
+                    path="/events/:id" 
+                    element={
+                      <PrivateRoute>
+                        <EventDetailPage />
+                      </PrivateRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/dashboard" 
+                    element={
+                      <PrivateRoute>
+                        <DashboardPage />
+                      </PrivateRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/settings" 
+                    element={
+                      <PrivateRoute>
+                        <SettingsPage />
+                      </PrivateRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/notifications" 
+                    element={
+                      <PrivateRoute>
+                        <NotificationsPage />
+                      </PrivateRoute>
+                    } 
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <PrivateRoute role="admin">
+                        <UserManagementProvider>
+                          <AdminDashboard />
+                        </UserManagementProvider>
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/users"
+                    element={
+                      <PrivateRoute role="admin">
+                        <UserManagementProvider>
+                          <AdminUserManagementPage />
+                        </UserManagementProvider>
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/volunteers"
+                    element={
+                      <PrivateRoute role="admin">
+                        <AdminVolunteerLogPage />
+                      </PrivateRoute>
+                    }
+                  />
 
-                {/* Catch-all 404 Route */}
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </ErrorBoundary>
-          </main>
-          <Notification />
-          <WhatsAppBubble />
-          <Footer />
-        </div>
-      </NotificationProvider>
-    </ThemeProvider>
+                  {/* Catch-all 404 Route */}
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </ErrorBoundary>
+            </main>
+            <Notification />
+            <WhatsAppBubble />
+            <Footer />
+          </div>
+        </NotificationProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 
 export default App;
+

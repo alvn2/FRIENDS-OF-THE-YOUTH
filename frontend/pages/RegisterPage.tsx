@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
+// Corrected import paths
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from '../context/NotificationContext';
+import { useNavigate, Link } from 'react-router-dom';
 
-// The backend server URL for Google OAuth
-const GOOGLE_AUTH_URL = '/api/auth/google';
+// No need for BACKEND_URL here anymore if proxy is correct
 
 const RegisterPage: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const { addNotification } = useNotification();
-  
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', password2: '' });
+
+  const [formData, setFormData] = useState({
+    name: '', email: '', password: '', password2: '', phone: ''
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  const { name, email, password, password2 } = formData;
+  const { name, email, password, password2, phone } = formData;
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,24 +28,32 @@ const RegisterPage: React.FC = () => {
       addNotification('Passwords do not match', 'error');
       return;
     }
+    if (!phone || !/^(07|\+?2547)\d{8}$/.test(phone)) {
+       addNotification('Please enter a valid Kenyan phone number (e.g., 07... or 2547...).', 'error');
+       return;
+    }
     setIsLoading(true);
     try {
-      await register(name, email, password);
-      navigate('/register-success');
+      await register(name, email, password, phone); 
+      addNotification('Registration successful! Welcome!', 'success'); 
+      navigate('/dashboard', { replace: true });
     } catch (err: any) {
-      const errorMessage = err.response?.data?.msg || "Registration failed. Please try again.";
+      const errorMessage = err.response?.data?.message || err.message || "Registration failed.";
       addNotification(errorMessage, 'error');
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
-  
+
   const handleGoogleLogin = () => {
     setIsGoogleLoading(true);
-    // Redirect to the backend endpoint for Google authentication
-    window.location.href = GOOGLE_AUTH_URL;
+    // --- FIX: Use the proxied path ---
+    window.location.href = '/api/auth/google'; 
+    // ---------------------------------
   };
 
-  return (
+  // --- Rest of the component's JSX remains the same ---
+  // ... (JSX for the form, Google button, etc.) ...
+ return (
     <section className="bg-white dark:bg-dark-bg">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:py-16">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-dark-card dark:border-gray-700">
@@ -53,20 +63,24 @@ const RegisterPage: React.FC = () => {
             </h1>
             <form className="space-y-4 md:space-y-6" onSubmit={onSubmit}>
               <div>
-                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your name</label>
-                <input type="text" name="name" id="name" value={name} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required />
+                <label htmlFor="reg-name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your name</label>
+                <input type="text" name="name" id="reg-name" value={name} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required />
               </div>
               <div>
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                <input type="email" name="email" id="email" value={email} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required />
+                <label htmlFor="reg-email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
+                <input type="email" name="email" id="reg-email" value={email} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required />
               </div>
               <div>
-                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                <input type="password" name="password" id="password" value={password} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required minLength={6} />
+                <label htmlFor="reg-phone" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone Number (07.. or 2547..)</label>
+                <input type="tel" name="phone" id="reg-phone" value={phone} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required pattern="^(07|\+?2547)\d{8}$" title="Enter a valid Kenyan number like 07... or 2547..." />
+              </div>
+              <div>
+                <label htmlFor="reg-password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                <input type="password" name="password" id="reg-password" value={password} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required minLength={6} />
               </div>
                <div>
-                <label htmlFor="password2" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
-                <input type="password" name="password2" id="password2" value={password2} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required minLength={6} />
+                <label htmlFor="reg-password2" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
+                <input type="password" name="password2" id="reg-password2" value={password2} onChange={onChange} className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600" required minLength={6} />
               </div>
               <button type="submit" disabled={isLoading || isGoogleLoading} className="w-full text-white bg-brand-primary hover:bg-brand-primary-dark focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:bg-gray-400">
                 {isLoading ? 'Creating account...' : 'Create account'}
@@ -104,3 +118,4 @@ const RegisterPage: React.FC = () => {
 };
 
 export default RegisterPage;
+

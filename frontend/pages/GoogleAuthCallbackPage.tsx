@@ -1,31 +1,38 @@
 import React, { useEffect } from 'react';
+// Import useNavigate and useLocation from react-router-dom
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useNotification } from '../context/NotificationContext';
+// --- FIX: Added .tsx extension to the import path ---
+import { useNotification } from '../context/NotificationContext.tsx'; 
+// ---------------------------------------------------
 
 const GoogleAuthCallbackPage: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate(); // Use the hook
+  const location = useLocation(); // Use the hook to get location
   const { addNotification } = useNotification();
-  
+
   useEffect(() => {
+    // Use URLSearchParams directly on location.search
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
-    const error = params.get('error');
+    const error = params.get('error'); // Check if the backend sent an error
 
     if (error) {
       addNotification(`Google login failed: ${error}`, 'error');
       navigate('/login');
     } else if (token) {
-      localStorage.setItem('token', token);
-      // Reloading the window will make AuthProvider pick up the new token
-      // and redirect to the dashboard. Using window.location.href to ensure
-      // a full state refresh after login.
-      window.location.href = '#/dashboard';
+      console.log("Token received via Google, saving:", token); // Add logging
+      // Save token with the correct key
+      localStorage.setItem('token', token); 
+      
+      // Use navigate instead of window.location
+      navigate('/dashboard', { replace: true }); 
+
     } else {
-      addNotification('Google authentication failed. No token received.', 'error');
+      addNotification('Google authentication failed. No token or error received.', 'error');
       navigate('/login');
     }
-  }, [location, navigate, addNotification]);
+    // Add location to dependency array as we read from it
+  }, [location, navigate, addNotification]); 
 
   return (
     <div className="flex justify-center items-center h-screen">
@@ -38,3 +45,4 @@ const GoogleAuthCallbackPage: React.FC = () => {
 };
 
 export default GoogleAuthCallbackPage;
+

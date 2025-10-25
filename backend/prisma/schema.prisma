@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums ---
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  X
+}
+
+enum DonationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum NewsletterSubscription {
+  DAILY
+  WEEKLY
+  NONE
+}
+
+// --- Models ---
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  password     String? // Optional for social logins
+  role         UserRole      @default(USER)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  authProvider AuthProvider  @default(EMAIL)
+  providerId   String?       @unique
+  newsletter   NewsletterSubscription?
+  phone        String?
+  bio          String?
+
+  // Relations
+  badges    UserBadge[]
+  posts     BulletinPost[]
+  donations Donation[]
+  rsvps     EventRSVP[]
+
+  @@map("users")
+}
+
+model Badge {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  description String
+  iconUrl     String
+  createdAt   DateTime    @default(now())
+  users       UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  assignedAt DateTime @default(now())
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@map("user_badges")
+}
+
+model BulletinPost {
+  id        String   @id @default(cuid())
+  title     String   @unique // <-- THIS IS THE FIX
+  content   String   @db.Text
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("bulletin_posts")
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  description String      @db.Text
+  date        DateTime
+  location    String
+  capacity    Int?
+  imageUrl    String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  rsvps       EventRSVP[]
+
+  @@map("events")
+}
+
+model EventRSVP {
+  id      String @id @default(cuid())
+  userId  String
+  eventId String
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@map("event_rsvps")
+}
+
+model Donation {
+  id                String         @id @default(cuid())
+  amount            Int
+  phone             String
+  status            DonationStatus @default(PENDING)
+  checkoutRequestId String         @unique
+  mpesaReceipt      String?
+  userId            String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("donations")
+}
+

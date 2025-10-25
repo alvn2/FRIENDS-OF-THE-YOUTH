@@ -1,152 +1,186 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
-import { User, Achievement } from '../types';
-import { MOCK_USERS_DATA } from '../constants';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback // Import useCallback
+} from 'react';
+// --- FIX: Correct relative path based on structure ---
+import apiClient from '../services/api'; 
+// ----------------------------------------------------
 
+// Define the shape of your User object (match backend response)
+// Ensure this matches the SELECT in backend middleware and controllers
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'USER' | 'ADMIN';
+  phone?: string | null; 
+  bio?: string | null;   
+  badges?: Array<any>; // Define more specific types if needed
+  donations?: Array<any>;
+  rsvps?: Array<any>;
+  // Add other fields returned by backend profile route if necessary
+}
+
+// Define the shape of the context
 interface AuthContextType {
-  token: string | null;
   user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
+  token: string | null;
+  isLoading: boolean; 
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, phone: string) => Promise<void>;
   logout: () => void;
-  updateUser: (data: Partial<User>, pictureFile?: File | null) => Promise<void>;
-  addAchievement: (achievement: Achievement) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const MOCK_API_DELAY = 500; // ms
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); 
 
-  const loadUser = useCallback(async () => {
-    const currentToken = localStorage.getItem('token');
-    if (currentToken) {
-      setToken(currentToken);
-      // --- MOCK BACKEND ---
-      await new Promise(resolve => setTimeout(resolve, MOCK_API_DELAY / 2));
-      if (currentToken === 'admin-token') {
-        setUser(MOCK_USERS_DATA.find(u => u.role === 'admin')!);
-      } else if (currentToken.startsWith('member-token')) {
-        // For new registrations, create a temporary user object
-        if(currentToken.includes('|')){
-           const [_, name, email] = currentToken.split('|');
-           setUser({
-                id: `user-${Date.now()}`,
-                name,
-                email,
-                role: 'member',
-                achievements: [],
-                profilePicture: `https://picsum.photos/seed/${email}/200`,
-           });
-        } else {
-            setUser(MOCK_USERS_DATA.find(u => u.role === 'member')!);
-        }
-      } else {
-        // Invalid token
-        localStorage.removeItem('token');
-        setToken(null);
-        setUser(null);
-      }
-      // --- END MOCK BACKEND ---
-    }
-    setIsLoading(false);
-  }, []);
-
+  // Initial Load and Token Handling
   useEffect(() => {
-    loadUser();
-  }, [loadUser]);
+    console.log("[DEBUG] AuthProvider Mount: Initial check.");
+    let initialToken: string | null = null;
+    const fullUrl = window.location.href;
+    const searchParams = new URLSearchParams(window.location.search);
+    let urlToken = searchParams.get('token');
 
-  const register = async (name: string, email: string, password: string) => {
-    // --- MOCK BACKEND ---
-    await new Promise(resolve => setTimeout(resolve, MOCK_API_DELAY));
-    // In a real app, you'd check if the email is already taken.
-    const mockToken = `member-token|${name}|${email}`; // Store name/email for mock user creation
-    localStorage.setItem('token', mockToken);
-    setToken(mockToken);
-    await loadUser();
-    // --- END MOCK BACKEND ---
-  };
+    if (!urlToken && fullUrl.includes('#') && fullUrl.includes('?')) {
+      const hashPart = fullUrl.split('#')[1];
+      const hashQueryString = hashPart.split('?')[1]; 
+      if (hashQueryString) {
+        const hashParams = new URLSearchParams(hashQueryString);
+        urlToken = hashParams.get('token');
+        console.log("[DEBUG] AuthProvider Mount: Found token in hash:", urlToken);
+      }
+    }
+
+    if (urlToken) {
+      console.log("[DEBUG] AuthProvider Mount: Using token from URL.");
+      initialToken = urlToken;
+      localStorage.setItem('token', initialToken); 
+      const pathBeforeHash = window.location.pathname;
+      const hashPath = window.location.hash.split('?')[0]; 
+      window.history.replaceState({}, document.title, pathBeforeHash + hashPath);
+    } else {
+      initialToken = localStorage.getItem('token');
+      console.log("[DEBUG] AuthProvider Mount: No URL token. Token from localStorage:", initialToken);
+    }
+
+    setToken(initialToken);
+    
+    if (!initialToken) {
+        console.log("[DEBUG] AuthProvider Mount: No initial token. Setting isLoading=false.");
+        setIsLoading(false);
+        setUser(null); 
+    }
+
+  }, []); 
+
+  // User Fetching Effect
+  useEffect(() => {
+    const loadUserFromToken = async () => {
+      const currentTokenInState = token;
+      console.log("[DEBUG] AuthProvider (useEffect[token]): Token changed, checking state:", currentTokenInState);
+
+      if (currentTokenInState) {
+         if (!isLoading) setIsLoading(true); 
+         
+         try {
+           console.log("[DEBUG] AuthProvider (useEffect[token]): Attempting to fetch profile...");
+           // Use '/users/profile' - proxy prepends '/api/v1'
+           const response = await apiClient.get('/users/profile'); 
+           console.log("[DEBUG] AuthProvider (useEffect[token]): Profile fetched successfully:", response.data.data);
+           setUser(response.data.data); 
+           console.log("[DEBUG] AuthProvider (useEffect[token]): Setting isLoading=false after successful fetch.");
+           setIsLoading(false); 
+         } catch (error: any) {
+           console.error('[DEBUG] AuthProvider (useEffect[token]): Failed to fetch profile:', error.response?.data || error.message);
+           localStorage.removeItem('token');
+           setUser(null); 
+           setToken(null); 
+           console.log("[DEBUG] AuthProvider (useEffect[token]): Setting isLoading=false after failed fetch.");
+           setIsLoading(false); 
+         }
+      } else {
+          console.log("[DEBUG] AuthProvider (useEffect[token]): Token is null. Ensuring user is null and isLoading=false.");
+          setUser(null);
+          if (isLoading) setIsLoading(false); 
+      }
+    };
+    
+    if (token !== undefined) { 
+        loadUserFromToken();
+    }
+
+  }, [token]); 
+
 
   const login = async (email: string, password: string) => {
-     // --- MOCK BACKEND ---
-    await new Promise(resolve => setTimeout(resolve, MOCK_API_DELAY));
-    if (password === 'password') {
-        if (email === 'admin@foty.org') {
-            localStorage.setItem('token', 'admin-token');
-            setToken('admin-token');
-            await loadUser();
-            return;
-        }
-        if (email === 'member@foty.org') {
-            localStorage.setItem('token', 'member-token');
-            setToken('member-token');
-            await loadUser();
-            return;
-        }
+      console.log("[DEBUG] AuthContext: Attempting login...");
+      setIsLoading(true); 
+      try {
+        // Use '/auth/login' - proxy prepends '/api/v1'
+        const response = await apiClient.post('/auth/login', { email, password }); 
+        const { token: newToken, user: loggedInUser } = response.data;
+        console.log("[DEBUG] AuthContext: Login successful. Setting token and user state immediately:", newToken, loggedInUser);
+        localStorage.setItem('token', newToken);
+        setUser(loggedInUser); 
+        setToken(newToken); 
+      } catch (error) {
+        console.error("[DEBUG] AuthContext: Login failed:", error);
+        setUser(null); 
+        setToken(null);
+        setIsLoading(false); 
+        throw error; 
+      }
+  };
+
+  const register = async (name: string, email: string, password: string, phone: string) => {
+    console.log("[DEBUG] AuthContext: Attempting registration...");
+    setIsLoading(true); 
+    try {
+       // Use '/auth/register' - proxy prepends '/api/v1'
+      const response = await apiClient.post('/auth/register', { name, email, password, phone }); 
+      const { token: newToken, user: newUser } = response.data;
+      console.log("[DEBUG] AuthContext: Registration successful. Setting token and user state immediately:", newToken, newUser);
+      localStorage.setItem('token', newToken);
+      setUser(newUser); 
+      setToken(newToken); 
+    } catch (error: any) {
+        console.error("[DEBUG] AuthContext: Registration failed - Backend Response:", error.response?.data || error.message);
+        setUser(null); 
+        setToken(null);
+        setIsLoading(false); 
+        throw error; 
     }
-    throw new Error("Invalid credentials");
-     // --- END MOCK BACKEND ---
   };
 
   const logout = () => {
+    console.log("[DEBUG] AuthContext: Logging out.");
+    setIsLoading(true); 
     localStorage.removeItem('token');
-    setToken(null);
-    setUser(null);
+    setUser(null); 
+    setToken(null); 
+    window.location.href = '#/login'; 
   };
 
-  const updateUser = async (data: Partial<User>, pictureFile?: File | null) => {
-    // --- MOCK BACKEND ---
-    await new Promise(resolve => setTimeout(resolve, MOCK_API_DELAY));
-    setUser(currentUser => {
-        if (!currentUser) return null;
-        let profilePicture = currentUser.profilePicture;
-        if (pictureFile) {
-            // In a real app, you'd upload this and get a URL.
-            // Here, we'll just use a local object URL for the preview.
-            profilePicture = URL.createObjectURL(pictureFile);
-        }
-        const updatedUser = { ...currentUser, ...data, profilePicture };
-        // Note: This mock update won't persist across page reloads.
-        return updatedUser;
-    });
-     // --- END MOCK BACKEND ---
-  };
-
-  const addAchievement = async (achievement: Achievement) => {
-    // --- MOCK BACKEND ---
-    await new Promise(resolve => setTimeout(resolve, 100)); // Quick update
-    setUser(currentUser => {
-      if (!currentUser || currentUser.achievements.some(a => a.id === achievement.id)) {
-        return currentUser;
-      }
-      return {
-        ...currentUser,
-        achievements: [...currentUser.achievements, achievement],
-      };
-    });
-    // --- END MOCK BACKEND ---
-  };
+  useEffect(() => {
+    console.log("%c[DEBUG] AuthContext State Change:", "color: blue; font-weight: bold;", { user: user ? user.email : null, token: token ? '***' : null, isLoading });
+  }, [user, token, isLoading]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        token,
-        user,
-        isAuthenticated: !!token,
-        isLoading,
-        register,
-        login,
-        logout,
-        updateUser,
-        addAchievement,
-      }}
-    >
-      {children}
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
+       {isLoading ? <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '1.2em'}}>Verifying Session...</div> : children}
     </AuthContext.Provider>
   );
 };
@@ -158,3 +192,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

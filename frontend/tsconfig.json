@@ -20,8 +20,17 @@
       ]
     },
     "skipLibCheck": true,
-    "types": ["node"],
+    // --- FIX 1: ADD VITE TYPES ---
+    // Added "vite/client" to make TypeScript recognize import.meta.env
+    "types": ["node", "vite/client"],
+    // ----------------------------
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "include": ["."], // This includes all files in the current directory (frontend/)
+  // --- FIX 2: REMOVE MISSING REFERENCE ---
+  // Removed the "references" section because tsconfig.node.json was not found
+  // "references": [{ "path": "./tsconfig.node.json" }]
+  // -------------------------------------
 }
+
